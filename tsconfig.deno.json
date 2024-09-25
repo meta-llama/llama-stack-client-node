@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["deno"],
+  "exclude": [],
+  "compilerOptions": {
+    "rootDir": "./deno",
+    "lib": ["es2020", "DOM"],
+    "paths": {
+      "llama-stack-client/_shims/auto/*": ["deno/_shims/auto/*-deno"],
+      "llama-stack-client/*": ["deno/*"],
+      "llama-stack-client": ["deno/index.ts"],
+    },
+    "noEmit": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "deno",
+    "pretty": true,
+    "sourceMap": true
+  }
+}
