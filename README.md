@@ -1,6 +1,6 @@
 # Llama Stack Client Node API Library
 
-[![NPM version](https://img.shields.io/npm/v/llama-stack-client.svg)](https://npmjs.org/package/llama-stack-client) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/llama-stack-client)
+[![NPM version](https://img.shields.io/npm/v/llama-stack-client.svg)](https://npmjs.org/package/llama-stack-client) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/llama-stack-client) [![Discord](https://img.shields.io/discord/1257833999603335178)](https://discord.gg/llama-stack)
 
 This library provides convenient access to the Llama Stack Client REST API from server-side TypeScript or JavaScript.
 
