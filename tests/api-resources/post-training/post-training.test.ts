@@ -8,24 +8,19 @@ const client = new LlamaStackClient({ baseURL: process.env['TEST_API_BASE_URL'] 
 describe('resource postTraining', () => {
   test('preferenceOptimize: only required params', async () => {
     const responsePromise = client.postTraining.preferenceOptimize({
-      algorithm: 'dpo',
       algorithm_config: { epsilon: 0, gamma: 0, reward_clip: 0, reward_scale: 0 },
-      dataset: { columns: { foo: 'dialog' }, content_url: 'https://example.com' },
-      finetuned_model: 'https://example.com',
+      finetuned_model: 'finetuned_model',
       hyperparam_search_config: { foo: true },
       job_uuid: 'job_uuid',
       logger_config: { foo: true },
-      optimizer_config: { lr: 0, lr_min: 0, optimizer_type: 'adam', weight_decay: 0 },
       training_config: {
-        batch_size: 0,
-        enable_activation_checkpointing: true,
-        fsdp_cpu_offload: true,
-        memory_efficient_fsdp_wrap: true,
+        data_config: { batch_size: 0, data_format: 'instruct', dataset_id: 'dataset_id', shuffle: true },
+        gradient_accumulation_steps: 0,
+        max_steps_per_epoch: 0,
+        max_validation_steps: 0,
         n_epochs: 0,
-        n_iters: 0,
-        shuffle: true,
+        optimizer_config: { lr: 0, num_warmup_steps: 0, optimizer_type: 'adam', weight_decay: 0 },
       },
-      validation_dataset: { columns: { foo: 'dialog' }, content_url: 'https://example.com' },
     });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -38,58 +33,51 @@ describe('resource postTraining', () => {
 
   test('preferenceOptimize: required and optional params', async () => {
     const response = await client.postTraining.preferenceOptimize({
-      algorithm: 'dpo',
       algorithm_config: { epsilon: 0, gamma: 0, reward_clip: 0, reward_scale: 0 },
-      dataset: { columns: { foo: 'dialog' }, content_url: 'https://example.com', metadata: { foo: true } },
-      finetuned_model: 'https://example.com',
+      finetuned_model: 'finetuned_model',
       hyperparam_search_config: { foo: true },
       job_uuid: 'job_uuid',
       logger_config: { foo: true },
-      optimizer_config: { lr: 0, lr_min: 0, optimizer_type: 'adam', weight_decay: 0 },
       training_config: {
-        batch_size: 0,
-        enable_activation_checkpointing: true,
-        fsdp_cpu_offload: true,
-        memory_efficient_fsdp_wrap: true,
+        data_config: {
+          batch_size: 0,
+          data_format: 'instruct',
+          dataset_id: 'dataset_id',
+          shuffle: true,
+          packed: true,
+          train_on_input: true,
+          validation_dataset_id: 'validation_dataset_id',
+        },
+        gradient_accumulation_steps: 0,
+        max_steps_per_epoch: 0,
+        max_validation_steps: 0,
         n_epochs: 0,
-        n_iters: 0,
-        shuffle: true,
+        optimizer_config: { lr: 0, num_warmup_steps: 0, optimizer_type: 'adam', weight_decay: 0 },
+        dtype: 'dtype',
+        efficiency_config: {
+          enable_activation_checkpointing: true,
+          enable_activation_offloading: true,
+          fsdp_cpu_offload: true,
+          memory_efficient_fsdp_wrap: true,
+        },
       },
-      validation_dataset: {
-        columns: { foo: 'dialog' },
-        content_url: 'https://example.com',
-        metadata: { foo: true },
-      },
-      'X-LlamaStack-ProviderData': 'X-LlamaStack-ProviderData',
     });
   });
 
   test('supervisedFineTune: only required params', async () => {
     const responsePromise = client.postTraining.supervisedFineTune({
-      algorithm: 'full',
-      algorithm_config: {
-        alpha: 0,
-        apply_lora_to_mlp: true,
-        apply_lora_to_output: true,
-        lora_attn_modules: ['string', 'string', 'string'],
-        rank: 0,
-      },
-      dataset: { columns: { foo: 'dialog' }, content_url: 'https://example.com' },
       hyperparam_search_config: { foo: true },
       job_uuid: 'job_uuid',
       logger_config: { foo: true },
       model: 'model',
-      optimizer_config: { lr: 0, lr_min: 0, optimizer_type: 'adam', weight_decay: 0 },
       training_config: {
-        batch_size: 0,
-        enable_activation_checkpointing: true,
-        fsdp_cpu_offload: true,
-        memory_efficient_fsdp_wrap: true,
+        data_config: { batch_size: 0, data_format: 'instruct', dataset_id: 'dataset_id', shuffle: true },
+        gradient_accumulation_steps: 0,
+        max_steps_per_epoch: 0,
+        max_validation_steps: 0,
         n_epochs: 0,
-        n_iters: 0,
-        shuffle: true,
+        optimizer_config: { lr: 0, num_warmup_steps: 0, optimizer_type: 'adam', weight_decay: 0 },
       },
-      validation_dataset: { columns: { foo: 'dialog' }, content_url: 'https://example.com' },
     });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -102,35 +90,44 @@ describe('resource postTraining', () => {
 
   test('supervisedFineTune: required and optional params', async () => {
     const response = await client.postTraining.supervisedFineTune({
-      algorithm: 'full',
-      algorithm_config: {
-        alpha: 0,
-        apply_lora_to_mlp: true,
-        apply_lora_to_output: true,
-        lora_attn_modules: ['string', 'string', 'string'],
-        rank: 0,
-      },
-      dataset: { columns: { foo: 'dialog' }, content_url: 'https://example.com', metadata: { foo: true } },
       hyperparam_search_config: { foo: true },
       job_uuid: 'job_uuid',
       logger_config: { foo: true },
       model: 'model',
-      optimizer_config: { lr: 0, lr_min: 0, optimizer_type: 'adam', weight_decay: 0 },
       training_config: {
-        batch_size: 0,
-        enable_activation_checkpointing: true,
-        fsdp_cpu_offload: true,
-        memory_efficient_fsdp_wrap: true,
+        data_config: {
+          batch_size: 0,
+          data_format: 'instruct',
+          dataset_id: 'dataset_id',
+          shuffle: true,
+          packed: true,
+          train_on_input: true,
+          validation_dataset_id: 'validation_dataset_id',
+        },
+        gradient_accumulation_steps: 0,
+        max_steps_per_epoch: 0,
+        max_validation_steps: 0,
         n_epochs: 0,
-        n_iters: 0,
-        shuffle: true,
+        optimizer_config: { lr: 0, num_warmup_steps: 0, optimizer_type: 'adam', weight_decay: 0 },
+        dtype: 'dtype',
+        efficiency_config: {
+          enable_activation_checkpointing: true,
+          enable_activation_offloading: true,
+          fsdp_cpu_offload: true,
+          memory_efficient_fsdp_wrap: true,
+        },
       },
-      validation_dataset: {
-        columns: { foo: 'dialog' },
-        content_url: 'https://example.com',
-        metadata: { foo: true },
+      algorithm_config: {
+        alpha: 0,
+        apply_lora_to_mlp: true,
+        apply_lora_to_output: true,
+        lora_attn_modules: ['string'],
+        rank: 0,
+        type: 'LoRA',
+        quantize_base: true,
+        use_dora: true,
       },
-      'X-LlamaStack-ProviderData': 'X-LlamaStack-ProviderData',
+      checkpoint_dir: 'checkpoint_dir',
     });
   });
 });

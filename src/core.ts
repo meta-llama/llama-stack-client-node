@@ -98,8 +98,10 @@ export class APIPromise<T> extends Promise<T> {
     });
   }
 
-  _thenUnwrap<U>(transform: (data: T) => U): APIPromise<U> {
-    return new APIPromise(this.responsePromise, async (props) => transform(await this.parseResponse(props)));
+  _thenUnwrap<U>(transform: (data: T, props: APIResponseProps) => U): APIPromise<U> {
+    return new APIPromise(this.responsePromise, async (props) =>
+      transform(await this.parseResponse(props), props),
+    );
   }
 
   /**
@@ -175,7 +177,7 @@ export abstract class APIClient {
     maxRetries = 2,
     timeout = 60000, // 1 minute
     httpAgent,
-    fetch: overridenFetch,
+    fetch: overriddenFetch,
   }: {
     baseURL: string;
     maxRetries?: number | undefined;
@@ -188,7 +190,7 @@ export abstract class APIClient {
     this.timeout = validatePositiveInteger('timeout', timeout);
     this.httpAgent = httpAgent;
 
-    this.fetch = overridenFetch ?? fetch;
+    this.fetch = overriddenFetch ?? fetch;
   }
 
   protected authHeaders(opts: FinalRequestOptions): Headers {
@@ -363,7 +365,15 @@ export abstract class APIClient {
       delete reqHeaders['content-type'];
     }
 
-    reqHeaders['x-stainless-retry-count'] = String(retryCount);
+    // Don't set the retry count header if it was already set or removed through default headers or by the
+    // caller. We check `defaultHeaders` and `headers`, which can contain nulls, instead of `reqHeaders` to
+    // account for the removal case.
+    if (
+      getHeader(defaultHeaders, 'x-stainless-retry-count') === undefined &&
+      getHeader(headers, 'x-stainless-retry-count') === undefined
+    ) {
+      reqHeaders['x-stainless-retry-count'] = String(retryCount);
+    }
 
     this.validateHeaders(reqHeaders, headers);
 
@@ -400,7 +410,7 @@ export abstract class APIClient {
     error: Object | undefined,
     message: string | undefined,
     headers: Headers | undefined,
-  ) {
+  ): APIError {
     return APIError.generate(status, error, message, headers);
   }
 
@@ -526,18 +536,22 @@ export abstract class APIClient {
 
     const timeout = setTimeout(() => controller.abort(), ms);
 
-    return (
-      this.getRequestClient()
-        // use undefined this binding; fetch errors if bound to something else in browser/cloudflare
-        .fetch.call(undefined, url, { signal: controller.signal as any, ...options })
-        .finally(() => {
-          clearTimeout(timeout);
-        })
-    );
-  }
+    const fetchOptions = {
+      signal: controller.signal as any,
+      ...options,
+    };
+    if (fetchOptions.method) {
+      // Custom methods like 'patch' need to be uppercased
+      // See https://github.com/nodejs/undici/issues/2294
+      fetchOptions.method = fetchOptions.method.toUpperCase();
+    }
 
-  protected getRequestClient(): RequestClient {
-    return { fetch: this.fetch };
+    return (
+      // use undefined this binding; fetch errors if bound to something else in browser/cloudflare
+      this.fetch.call(undefined, url, fetchOptions).finally(() => {
+        clearTimeout(timeout);
+      })
+    );
   }
 
   private shouldRetry(response: Response): boolean {
@@ -672,9 +686,9 @@ export abstract class AbstractPage<Item> implements AsyncIterable<Item> {
     return await this.#client.requestAPIList(this.constructor as any, nextOptions);
   }
 
-  async *iterPages() {
+  async *iterPages(): AsyncGenerator<this> {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let page: AbstractPage<Item> = this;
+    let page: this = this;
     yield page;
     while (page.hasNextPage()) {
       page = await page.getNextPage();
@@ -682,7 +696,7 @@ export abstract class AbstractPage<Item> implements AsyncIterable<Item> {
     }
   }
 
-  async *[Symbol.asyncIterator]() {
+  async *[Symbol.asyncIterator](): AsyncGenerator<Item> {
     for await (const page of this.iterPages()) {
       for (const item of page.getPaginatedItems()) {
         yield item;
@@ -725,7 +739,7 @@ export class PagePromise<
    *      console.log(item)
    *    }
    */
-  async *[Symbol.asyncIterator]() {
+  async *[Symbol.asyncIterator](): AsyncGenerator<Item> {
     const page = await this;
     for await (const item of page) {
       yield item;
@@ -982,8 +996,8 @@ export const safeJSON = (text: string) => {
   }
 };
 
-// https://stackoverflow.com/a/19709846
-const startsWithSchemeRegexp = new RegExp('^(?:[a-z]+:)?//', 'i');
+// https://url.spec.whatwg.org/#url-scheme-string
+const startsWithSchemeRegexp = /^[a-z][a-z0-9+.-]*:/i;
 const isAbsoluteURL = (url: string): boolean => {
   return startsWithSchemeRegexp.test(url);
 };
@@ -1145,7 +1159,15 @@ export const isHeadersProtocol = (headers: any): headers is HeadersProtocol => {
   return typeof headers?.get === 'function';
 };
 
-export const getRequiredHeader = (headers: HeadersLike, header: string): string => {
+export const getRequiredHeader = (headers: HeadersLike | Headers, header: string): string => {
+  const foundHeader = getHeader(headers, header);
+  if (foundHeader === undefined) {
+    throw new Error(`Could not find ${header} header`);
+  }
+  return foundHeader;
+};
+
+export const getHeader = (headers: HeadersLike | Headers, header: string): string | undefined => {
   const lowerCasedHeader = header.toLowerCase();
   if (isHeadersProtocol(headers)) {
     // to deal with the case where the header looks like Stainless-Event-Id
@@ -1171,7 +1193,7 @@ export const getRequiredHeader = (headers: HeadersLike, header: string): string 
     }
   }
 
-  throw new Error(`Could not find ${header} header`);
+  return undefined;
 };
 
 /**

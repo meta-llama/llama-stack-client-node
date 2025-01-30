@@ -31,69 +31,35 @@ describe('resource agents', () => {
         instructions: 'instructions',
         max_infer_iters: 0,
         model: 'model',
-        input_shields: ['string', 'string', 'string'],
-        output_shields: ['string', 'string', 'string'],
-        sampling_params: {
-          strategy: 'greedy',
-          max_tokens: 0,
-          repetition_penalty: 0,
-          temperature: 0,
-          top_k: 0,
-          top_p: 0,
-        },
-        tool_choice: 'auto',
-        tool_prompt_format: 'json',
-        tools: [
+        client_tools: [
           {
-            api_key: 'api_key',
-            engine: 'bing',
-            type: 'brave_search',
-            input_shields: ['string', 'string', 'string'],
-            output_shields: ['string', 'string', 'string'],
-            remote_execution: {
-              method: 'GET',
-              url: 'https://example.com',
-              body: { foo: true },
-              headers: { foo: true },
-              params: { foo: true },
-            },
-          },
-          {
-            api_key: 'api_key',
-            engine: 'bing',
-            type: 'brave_search',
-            input_shields: ['string', 'string', 'string'],
-            output_shields: ['string', 'string', 'string'],
-            remote_execution: {
-              method: 'GET',
-              url: 'https://example.com',
-              body: { foo: true },
-              headers: { foo: true },
-              params: { foo: true },
-            },
-          },
-          {
-            api_key: 'api_key',
-            engine: 'bing',
-            type: 'brave_search',
-            input_shields: ['string', 'string', 'string'],
-            output_shields: ['string', 'string', 'string'],
-            remote_execution: {
-              method: 'GET',
-              url: 'https://example.com',
-              body: { foo: true },
-              headers: { foo: true },
-              params: { foo: true },
-            },
+            name: 'name',
+            description: 'description',
+            metadata: { foo: true },
+            parameters: [
+              {
+                description: 'description',
+                name: 'name',
+                parameter_type: 'parameter_type',
+                required: true,
+                default: true,
+              },
+            ],
           },
         ],
+        input_shields: ['string'],
+        output_shields: ['string'],
+        response_format: { json_schema: { foo: true }, type: 'json_schema' },
+        sampling_params: { strategy: { type: 'greedy' }, max_tokens: 0, repetition_penalty: 0 },
+        tool_choice: 'auto',
+        tool_prompt_format: 'json',
+        toolgroups: ['string'],
       },
-      'X-LlamaStack-ProviderData': 'X-LlamaStack-ProviderData',
     });
   });
 
-  test('delete: only required params', async () => {
-    const responsePromise = client.agents.delete({ agent_id: 'agent_id' });
+  test('delete', async () => {
+    const responsePromise = client.agents.delete('agent_id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -103,10 +69,10 @@ describe('resource agents', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('delete: required and optional params', async () => {
-    const response = await client.agents.delete({
-      agent_id: 'agent_id',
-      'X-LlamaStack-ProviderData': 'X-LlamaStack-ProviderData',
-    });
+  test('delete: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.agents.delete('agent_id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      LlamaStackClient.NotFoundError,
+    );
   });
 });

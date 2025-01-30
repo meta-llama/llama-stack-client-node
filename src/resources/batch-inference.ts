@@ -2,105 +2,66 @@
 
 import { APIResource } from '../resource';
 import * as Core from '../core';
-import * as BatchInferenceAPI from './batch-inference';
+import * as InferenceAPI from './inference';
 import * as Shared from './shared';
-import * as AgentsAPI from './agents/agents';
 
 export class BatchInference extends APIResource {
   chatCompletion(
-    params: BatchInferenceChatCompletionParams,
+    body: BatchInferenceChatCompletionParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<BatchChatCompletion> {
-    const { 'X-LlamaStack-ProviderData': xLlamaStackProviderData, ...body } = params;
-    return this._client.post('/batch_inference/chat_completion', {
-      body,
-      ...options,
-      headers: {
-        ...(xLlamaStackProviderData != null ?
-          { 'X-LlamaStack-ProviderData': xLlamaStackProviderData }
-        : undefined),
-        ...options?.headers,
-      },
-    });
+  ): Core.APIPromise<BatchInferenceChatCompletionResponse> {
+    return this._client.post('/v1/batch-inference/chat-completion', { body, ...options });
   }
 
   completion(
-    params: BatchInferenceCompletionParams,
+    body: BatchInferenceCompletionParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<Shared.BatchCompletion> {
-    const { 'X-LlamaStack-ProviderData': xLlamaStackProviderData, ...body } = params;
-    return this._client.post('/batch_inference/completion', {
-      body,
-      ...options,
-      headers: {
-        ...(xLlamaStackProviderData != null ?
-          { 'X-LlamaStack-ProviderData': xLlamaStackProviderData }
-        : undefined),
-        ...options?.headers,
-      },
-    });
+    return this._client.post('/v1/batch-inference/completion', { body, ...options });
   }
 }
 
-export interface BatchChatCompletion {
-  completion_message_batch: Array<Shared.CompletionMessage>;
+export interface BatchInferenceChatCompletionResponse {
+  batch: Array<BatchInferenceChatCompletionResponse.Batch>;
+}
+
+export namespace BatchInferenceChatCompletionResponse {
+  export interface Batch {
+    /**
+     * The complete response message
+     */
+    completion_message: Shared.CompletionMessage;
+
+    /**
+     * Optional log probabilities for generated tokens
+     */
+    logprobs?: Array<InferenceAPI.TokenLogProbs>;
+  }
 }
 
 export interface BatchInferenceChatCompletionParams {
-  /**
-   * Body param:
-   */
-  messages_batch: Array<
-    Array<Shared.UserMessage | Shared.SystemMessage | Shared.ToolResponseMessage | Shared.CompletionMessage>
-  >;
+  messages_batch: Array<Array<Shared.Message>>;
 
-  /**
-   * Body param:
-   */
   model: string;
 
-  /**
-   * Body param:
-   */
   logprobs?: BatchInferenceChatCompletionParams.Logprobs;
 
-  /**
-   * Body param:
-   */
+  response_format?: Shared.ResponseFormat;
+
   sampling_params?: Shared.SamplingParams;
 
-  /**
-   * Body param:
-   */
   tool_choice?: 'auto' | 'required';
 
-  /**
-   * Body param: `json` -- Refers to the json format for calling tools. The json
-   * format takes the form like { "type": "function", "function" : { "name":
-   * "function_name", "description": "function_description", "parameters": {...} } }
-   *
-   * `function_tag` -- This is an example of how you could define your own user
-   * defined format for making tool calls. The function_tag format looks like this,
-   * <function=function_name>(parameters)</function>
-   *
-   * The detailed prompts for each of these formats are added to llama cli
-   */
-  tool_prompt_format?: 'json' | 'function_tag';
+  tool_prompt_format?: 'json' | 'function_tag' | 'python_list';
 
-  /**
-   * Body param:
-   */
   tools?: Array<BatchInferenceChatCompletionParams.Tool>;
-
-  /**
-   * Header param: JSON-encoded provider data which will be made available to the
-   * adapter servicing the API
-   */
-  'X-LlamaStack-ProviderData'?: string;
 }
 
 export namespace BatchInferenceChatCompletionParams {
   export interface Logprobs {
+    /**
+     * How many tokens (for each position) to return log probabilities for.
+     */
     top_k?: number;
   }
 
@@ -109,46 +70,35 @@ export namespace BatchInferenceChatCompletionParams {
 
     description?: string;
 
-    parameters?: Record<string, AgentsAPI.ToolParamDefinition>;
+    parameters?: Record<string, Shared.ToolParamDefinition>;
   }
 }
 
 export interface BatchInferenceCompletionParams {
-  /**
-   * Body param:
-   */
-  content_batch: Array<string | Array<string>>;
+  content_batch: Array<Shared.InterleavedContent>;
 
-  /**
-   * Body param:
-   */
   model: string;
 
-  /**
-   * Body param:
-   */
   logprobs?: BatchInferenceCompletionParams.Logprobs;
 
-  /**
-   * Body param:
-   */
-  sampling_params?: Shared.SamplingParams;
+  response_format?: Shared.ResponseFormat;
 
-  /**
-   * Header param: JSON-encoded provider data which will be made available to the
-   * adapter servicing the API
-   */
-  'X-LlamaStack-ProviderData'?: string;
+  sampling_params?: Shared.SamplingParams;
 }
 
 export namespace BatchInferenceCompletionParams {
   export interface Logprobs {
+    /**
+     * How many tokens (for each position) to return log probabilities for.
+     */
     top_k?: number;
   }
 }
 
-export namespace BatchInference {
-  export import BatchChatCompletion = BatchInferenceAPI.BatchChatCompletion;
-  export import BatchInferenceChatCompletionParams = BatchInferenceAPI.BatchInferenceChatCompletionParams;
-  export import BatchInferenceCompletionParams = BatchInferenceAPI.BatchInferenceCompletionParams;
+export declare namespace BatchInference {
+  export {
+    type BatchInferenceChatCompletionResponse as BatchInferenceChatCompletionResponse,
+    type BatchInferenceChatCompletionParams as BatchInferenceChatCompletionParams,
+    type BatchInferenceCompletionParams as BatchInferenceCompletionParams,
+  };
 }

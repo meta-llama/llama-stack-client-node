@@ -1,88 +1,68 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../resource';
-import { isRequestOptions } from '../core';
 import * as Core from '../core';
-import * as ModelsAPI from './models';
 
 export class Models extends APIResource {
-  list(params?: ModelListParams, options?: Core.RequestOptions): Core.APIPromise<ModelServingSpec>;
-  list(options?: Core.RequestOptions): Core.APIPromise<ModelServingSpec>;
-  list(
-    params: ModelListParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<ModelServingSpec> {
-    if (isRequestOptions(params)) {
-      return this.list({}, params);
-    }
-    const { 'X-LlamaStack-ProviderData': xLlamaStackProviderData } = params;
-    return this._client.get('/models/list', {
-      ...options,
-      headers: {
-        ...(xLlamaStackProviderData != null ?
-          { 'X-LlamaStack-ProviderData': xLlamaStackProviderData }
-        : undefined),
-        ...options?.headers,
-      },
-    });
+  retrieve(modelId: string, options?: Core.RequestOptions): Core.APIPromise<Model | null> {
+    return this._client.get(`/v1/models/${modelId}`, options);
   }
 
-  get(params: ModelGetParams, options?: Core.RequestOptions): Core.APIPromise<ModelServingSpec | null> {
-    const { 'X-LlamaStack-ProviderData': xLlamaStackProviderData, ...query } = params;
-    return this._client.get('/models/get', {
-      query,
+  list(options?: Core.RequestOptions): Core.APIPromise<ModelListResponse> {
+    return (
+      this._client.get('/v1/models', options) as Core.APIPromise<{ data: ModelListResponse }>
+    )._thenUnwrap((obj) => obj.data);
+  }
+
+  register(body: ModelRegisterParams, options?: Core.RequestOptions): Core.APIPromise<Model> {
+    return this._client.post('/v1/models', { body, ...options });
+  }
+
+  unregister(modelId: string, options?: Core.RequestOptions): Core.APIPromise<void> {
+    return this._client.delete(`/v1/models/${modelId}`, {
       ...options,
-      headers: {
-        ...(xLlamaStackProviderData != null ?
-          { 'X-LlamaStack-ProviderData': xLlamaStackProviderData }
-        : undefined),
-        ...options?.headers,
-      },
+      headers: { Accept: '*/*', ...options?.headers },
     });
   }
 }
 
-export interface ModelServingSpec {
-  /**
-   * The model family and SKU of the model along with other parameters corresponding
-   * to the model.
-   */
-  llama_model: unknown;
-
-  provider_config: ModelServingSpec.ProviderConfig;
+export interface ListModelsResponse {
+  data: Array<Model>;
 }
 
-export namespace ModelServingSpec {
-  export interface ProviderConfig {
-    config: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
+export interface Model {
+  identifier: string;
 
-    provider_id: string;
-  }
+  metadata: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
+
+  model_type: 'llm' | 'embedding';
+
+  provider_id: string;
+
+  provider_resource_id: string;
+
+  type: 'model';
 }
 
-export interface ModelListParams {
-  /**
-   * JSON-encoded provider data which will be made available to the adapter servicing
-   * the API
-   */
-  'X-LlamaStack-ProviderData'?: string;
+export type ModelListResponse = Array<Model>;
+
+export interface ModelRegisterParams {
+  model_id: string;
+
+  metadata?: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
+
+  model_type?: 'llm' | 'embedding';
+
+  provider_id?: string;
+
+  provider_model_id?: string;
 }
 
-export interface ModelGetParams {
-  /**
-   * Query param:
-   */
-  core_model_id: string;
-
-  /**
-   * Header param: JSON-encoded provider data which will be made available to the
-   * adapter servicing the API
-   */
-  'X-LlamaStack-ProviderData'?: string;
-}
-
-export namespace Models {
-  export import ModelServingSpec = ModelsAPI.ModelServingSpec;
-  export import ModelListParams = ModelsAPI.ModelListParams;
-  export import ModelGetParams = ModelsAPI.ModelGetParams;
+export declare namespace Models {
+  export {
+    type ListModelsResponse as ListModelsResponse,
+    type Model as Model,
+    type ModelListResponse as ModelListResponse,
+    type ModelRegisterParams as ModelRegisterParams,
+  };
 }

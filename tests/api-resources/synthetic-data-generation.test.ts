@@ -8,11 +8,7 @@ const client = new LlamaStackClient({ baseURL: process.env['TEST_API_BASE_URL'] 
 describe('resource syntheticDataGeneration', () => {
   test('generate: only required params', async () => {
     const responsePromise = client.syntheticDataGeneration.generate({
-      dialogs: [
-        { content: 'string', role: 'user' },
-        { content: 'string', role: 'user' },
-        { content: 'string', role: 'user' },
-      ],
+      dialogs: [{ content: 'string', role: 'user' }],
       filtering_function: 'none',
     });
     const rawResponse = await responsePromise.asResponse();
@@ -26,14 +22,9 @@ describe('resource syntheticDataGeneration', () => {
 
   test('generate: required and optional params', async () => {
     const response = await client.syntheticDataGeneration.generate({
-      dialogs: [
-        { content: 'string', role: 'user', context: 'string' },
-        { content: 'string', role: 'user', context: 'string' },
-        { content: 'string', role: 'user', context: 'string' },
-      ],
+      dialogs: [{ content: 'string', role: 'user', context: 'string' }],
       filtering_function: 'none',
       model: 'model',
-      'X-LlamaStack-ProviderData': 'X-LlamaStack-ProviderData',
     });
   });
 });

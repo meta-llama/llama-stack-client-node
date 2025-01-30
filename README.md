@@ -1,10 +1,10 @@
-# Llama Stack Client Node API Library
+# Llama Stack Client TypeScript and JavaScript API Library
 
 [![NPM version](https://img.shields.io/npm/v/llama-stack-client.svg)](https://npmjs.org/package/llama-stack-client) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/llama-stack-client) [![Discord](https://img.shields.io/discord/1257833999603335178)](https://discord.gg/llama-stack)
 
 This library provides convenient access to the Llama Stack Client REST API from server-side TypeScript or JavaScript.
 
-The REST API documentation can be found on [llama-stack](https://github.com/meta-llama/llama-stack/blob/main/docs/resources/llama-stack-spec.html). The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [https://llama-stack.readthedocs.io/en/latest/references/api_reference/index.html](https://llama-stack.readthedocs.io/en/latest/references/api_reference/index.html). The full API of this library can be found in [api.md](api.md).
 
 It is generated with [Stainless](https://www.stainlessapi.com/).
 
@@ -13,7 +13,6 @@ It is generated with [Stainless](https://www.stainlessapi.com/).
 ```sh
 npm install llama-stack-client
 ```
-
 
 ## Usage
 
@@ -24,17 +23,39 @@ The full API of this library can be found in [api.md](api.md).
 import LlamaStackClient from 'llama-stack-client';
 
 const client = new LlamaStackClient({
-  environment: 'sandbox', // defaults to 'production'
+  baseURL: 'http://localhost:8321'
 });
 
 async function main() {
-  const session = await client.agents.sessions.create({ agent_id: 'agent_id', session_name: 'session_name' });
+  const models = await client.models.list();
 
-  console.log(session.session_id);
+  console.log(models);
 }
 
 main();
 ```
+
+## Streaming responses
+
+We provide support for streaming responses using Server Sent Events (SSE).
+
+```ts
+import LlamaStackClient from 'llama-stack-client';
+
+const client = new LlamaStackClient();
+
+const stream = await client.inference.chatCompletion({
+  messages: [{ content: 'string', role: 'user' }],
+  model_id: 'meta-llama/Llama-3.2-3B-Instruct',
+  stream: true,
+});
+for await (const inferenceChatCompletionResponse of stream) {
+  process.stdout.write(inferenceChatCompletionResponse.event.delta.text || '');
+}
+```
+
+If you need to cancel a stream, you can `break` from the loop
+or call `stream.controller.abort()`.
 
 ### Request & Response types
 
@@ -44,16 +65,16 @@ This library includes TypeScript definitions for all request params and response
 ```ts
 import LlamaStackClient from 'llama-stack-client';
 
-const client = new LlamaStackClient({
-  environment: 'sandbox', // defaults to 'production'
-});
+const client = new LlamaStackClient();
 
 async function main() {
-  const params: LlamaStackClient.Agents.SessionCreateParams = {
-    agent_id: 'agent_id',
-    session_name: 'session_name',
+  const params: LlamaStackClient.InferenceChatCompletionParams = {
+    messages: [{ content: 'string', role: 'user' }],
+    model_id: 'model_id',
   };
-  const session: LlamaStackClient.Agents.SessionCreateResponse = await client.agents.sessions.create(params);
+  const response: LlamaStackClient.InferenceChatCompletionResponse = await client.inference.chatCompletion(
+    params,
+  );
 }
 
 main();
@@ -70,8 +91,8 @@ a subclass of `APIError` will be thrown:
 <!-- prettier-ignore -->
 ```ts
 async function main() {
-  const session = await client.agents.sessions
-    .create({ agent_id: 'agent_id', session_name: 'session_name' })
+  const response = await client.inference
+    .chatCompletion({ messages: [{ content: 'string', role: 'user' }], model_id: 'model_id' })
     .catch(async (err) => {
       if (err instanceof LlamaStackClient.APIError) {
         console.log(err.status); // 400
@@ -115,7 +136,7 @@ const client = new LlamaStackClient({
 });
 
 // Or, configure per-request:
-await client.agents.sessions.create({ agent_id: 'agent_id', session_name: 'session_name' }, {
+await client.inference.chatCompletion({ messages: [{ content: 'string', role: 'user' }], model_id: 'model_id' }, {
   maxRetries: 5,
 });
 ```
@@ -132,7 +153,7 @@ const client = new LlamaStackClient({
 });
 
 // Override per-request:
-await client.agents.sessions.create({ agent_id: 'agent_id', session_name: 'session_name' }, {
+await client.inference.chatCompletion({ messages: [{ content: 'string', role: 'user' }], model_id: 'model_id' }, {
   timeout: 5 * 1000,
 });
 ```
@@ -153,17 +174,17 @@ You can also use the `.withResponse()` method to get the raw `Response` along wi
 ```ts
 const client = new LlamaStackClient();
 
-const response = await client.agents.sessions
-  .create({ agent_id: 'agent_id', session_name: 'session_name' })
+const response = await client.inference
+  .chatCompletion({ messages: [{ content: 'string', role: 'user' }], model_id: 'model_id' })
   .asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
-const { data: session, response: raw } = await client.agents.sessions
-  .create({ agent_id: 'agent_id', session_name: 'session_name' })
+const { data: response, response: raw } = await client.inference
+  .chatCompletion({ messages: [{ content: 'string', role: 'user' }], model_id: 'model_id' })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(session.session_id);
+console.log(response);
 ```
 
 ### Making custom/undocumented requests
@@ -267,8 +288,8 @@ const client = new LlamaStackClient({
 });
 
 // Override per-request:
-await client.agents.sessions.create(
-  { agent_id: 'agent_id', session_name: 'session_name' },
+await client.inference.chatCompletion(
+  { messages: [{ content: 'string', role: 'user' }], model_id: 'model_id' },
   {
     httpAgent: new http.Agent({ keepAlive: false }),
   },
@@ -280,7 +301,7 @@ await client.agents.sessions.create(
 This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) conventions, though certain backwards-incompatible changes may be released as minor versions:
 
 1. Changes that only affect static types, without breaking runtime behavior.
-2. Changes to library internals which are technically public but not intended or documented for external use. _(Please open a GitHub issue to let us know if you are relying on such internals)_.
+2. Changes to library internals which are technically public but not intended or documented for external use. _(Please open a GitHub issue to let us know if you are relying on such internals.)_
 3. Changes that we do not expect to impact the vast majority of users in practice.
 
 We take backwards-compatibility seriously and work hard to ensure you can rely on a smooth upgrade experience.
@@ -293,6 +314,19 @@ TypeScript >= 4.5 is supported.
 
 The following runtimes are supported:
 
+- Web browsers (Up-to-date Chrome, Firefox, Safari, Edge, and more)
+- Node.js 18 LTS or later ([non-EOL](https://endoflife.date/nodejs)) versions.
+- Deno v1.28.0 or higher.
+- Bun 1.0 or later.
+- Cloudflare Workers.
+- Vercel Edge Runtime.
+- Jest 28 or greater with the `"node"` environment (`"jsdom"` is not supported at this time).
+- Nitro v2.6 or greater.
+
 Note that React Native is not supported at this time.
 
 If you are interested in other runtime environments, please open or upvote an issue on GitHub.
+
+## Contributing
+
+See [the contributing documentation](./CONTRIBUTING.md).

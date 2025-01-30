@@ -1,33 +1,30 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-export { AgentsStep, StepRetrieveParams, Steps } from './steps';
 export {
-  AgentsTurnStreamChunk,
-  Turn,
-  TurnStreamEvent,
-  TurnCreateParams,
-  TurnCreateParamsNonStreaming,
-  TurnCreateParamsStreaming,
-  TurnRetrieveParams,
-  Turns,
-} from './turns';
-export {
-  InferenceStep,
-  MemoryRetrievalStep,
-  RestAPIExecutionConfig,
-  ShieldCallStep,
-  ToolExecutionStep,
-  ToolParamDefinition,
-  AgentCreateResponse,
-  AgentCreateParams,
-  AgentDeleteParams,
   Agents,
+  type InferenceStep,
+  type MemoryRetrievalStep,
+  type ShieldCallStep,
+  type ToolExecutionStep,
+  type ToolResponse,
+  type AgentCreateResponse,
+  type AgentCreateParams,
 } from './agents';
 export {
-  Session,
-  SessionCreateResponse,
-  SessionCreateParams,
-  SessionRetrieveParams,
-  SessionDeleteParams,
-  Sessions,
-} from './sessions';
+  SessionResource,
+  type Session,
+  type SessionCreateResponse,
+  type SessionCreateParams,
+  type SessionRetrieveParams,
+} from './session';
+export { Steps, type StepRetrieveResponse } from './steps';
+export {
+  TurnResource,
+  type Turn,
+  type TurnResponseEvent,
+  type TurnResponseEventPayload,
+  type TurnCreateResponse,
+  type TurnCreateParams,
+  type TurnCreateParamsNonStreaming,
+  type TurnCreateParamsStreaming,
+} from './turn';

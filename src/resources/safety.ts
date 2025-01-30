@@ -2,65 +2,26 @@
 
 import { APIResource } from '../resource';
 import * as Core from '../core';
-import * as SafetyAPI from './safety';
 import * as Shared from './shared';
 
 export class Safety extends APIResource {
-  runShield(params: SafetyRunShieldParams, options?: Core.RequestOptions): Core.APIPromise<RunSheidResponse> {
-    const { 'X-LlamaStack-ProviderData': xLlamaStackProviderData, ...body } = params;
-    return this._client.post('/safety/run_shield', {
-      body,
-      ...options,
-      headers: {
-        ...(xLlamaStackProviderData != null ?
-          { 'X-LlamaStack-ProviderData': xLlamaStackProviderData }
-        : undefined),
-        ...options?.headers,
-      },
-    });
+  runShield(body: SafetyRunShieldParams, options?: Core.RequestOptions): Core.APIPromise<RunShieldResponse> {
+    return this._client.post('/v1/safety/run-shield', { body, ...options });
   }
 }
 
-export interface RunSheidResponse {
-  violation?: RunSheidResponse.Violation;
-}
-
-export namespace RunSheidResponse {
-  export interface Violation {
-    metadata: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
-
-    violation_level: 'info' | 'warn' | 'error';
-
-    user_message?: string;
-  }
+export interface RunShieldResponse {
+  violation?: Shared.SafetyViolation;
 }
 
 export interface SafetyRunShieldParams {
-  /**
-   * Body param:
-   */
-  messages: Array<
-    Shared.UserMessage | Shared.SystemMessage | Shared.ToolResponseMessage | Shared.CompletionMessage
-  >;
+  messages: Array<Shared.Message>;
 
-  /**
-   * Body param:
-   */
   params: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
 
-  /**
-   * Body param:
-   */
-  shield_type: string;
-
-  /**
-   * Header param: JSON-encoded provider data which will be made available to the
-   * adapter servicing the API
-   */
-  'X-LlamaStack-ProviderData'?: string;
+  shield_id: string;
 }
 
-export namespace Safety {
-  export import RunSheidResponse = SafetyAPI.RunSheidResponse;
-  export import SafetyRunShieldParams = SafetyAPI.SafetyRunShieldParams;
+export declare namespace Safety {
+  export { type RunShieldResponse as RunShieldResponse, type SafetyRunShieldParams as SafetyRunShieldParams };
 }
