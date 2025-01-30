@@ -1,6 +1,6 @@
 # Llama Stack Client Node API Library
 
-[![NPM version](https://img.shields.io/npm/v/llama-stack-client.svg)](https://npmjs.org/package/llama-stack-client) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/llama-stack-client)
+[![NPM version](https://img.shields.io/npm/v/llama-stack-client.svg)](https://npmjs.org/package/llama-stack-client) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/llama-stack-client) [![Discord](https://img.shields.io/discord/1257833999603335178)](https://discord.gg/llama-stack)
 
 This library provides convenient access to the Llama Stack Client REST API from server-side TypeScript or JavaScript.
 
@@ -11,11 +11,8 @@ It is generated with [Stainless](https://www.stainlessapi.com/).
 ## Installation
 
 ```sh
-npm install git+ssh://git@github.com:stainless-sdks/llama-stack-node.git
+npm install llama-stack-client
 ```
-
-> [!NOTE]
-> Once this package is [published to npm](https://app.stainlessapi.com/docs/guides/publish), this will become: `npm install llama-stack-client`
 
 ## Usage
 
@@ -25,12 +22,14 @@ The full API of this library can be found in [api.md](api.md).
 ```js
 import LlamaStackClient from 'llama-stack-client';
 
-const client = new LlamaStackClient();
+const client = new LlamaStackClient({
+  baseURL: 'http://localhost:8321'
+});
 
 async function main() {
-  const model = await client.models.register({ model_id: 'model_id' });
+  const models = await client.models.list();
 
-  console.log(model.identifier);
+  console.log(models);
 }
 
 main();
@@ -47,11 +46,11 @@ const client = new LlamaStackClient();
 
 const stream = await client.inference.chatCompletion({
   messages: [{ content: 'string', role: 'user' }],
-  model_id: 'model_id',
+  model_id: 'meta-llama/Llama-3.2-3B-Instruct',
   stream: true,
 });
 for await (const inferenceChatCompletionResponse of stream) {
-  console.log(inferenceChatCompletionResponse);
+  process.stdout.write(inferenceChatCompletionResponse.event.delta.text || '');
 }
 ```
 
