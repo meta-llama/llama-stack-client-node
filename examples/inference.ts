@@ -1,7 +1,6 @@
 #!/usr/bin/env -S npm run tsn -T
 
-import LlamaStackClient from 'llama-stack-client';
-
+const LlamaStackClient = require('llama-stack-client').default;
 const client = new LlamaStackClient({ baseURL: 'http://localhost:8321' });
 
 async function main() {
@@ -9,7 +8,7 @@ async function main() {
   const models = await client.models.list();
   console.log(models);
 
-  // chat completion
+  // non-streaming chat-completion
   const chatCompletion = await client.inference.chatCompletion({
     messages: [{ content: 'Hello, how are you?', role: 'user' }],
     model_id: 'meta-llama/Llama-3.2-3B-Instruct',
@@ -22,13 +21,10 @@ async function main() {
     model_id: 'meta-llama/Llama-3.2-3B-Instruct',
     stream: true,
   });
-
-  for await (const inferenceChatCompletionResponse of stream) {
-    process.stdout.write(inferenceChatCompletionResponse.event.delta.text || '');
+  for await (const chunk of stream) {
+    process.stdout.write(chunk.event.delta.text || '');
   }
   process.stdout.write('\n');
-
 }
-
 
 main();
