@@ -4,7 +4,7 @@
 
 This library provides convenient access to the Llama Stack Client REST API from server-side TypeScript or JavaScript.
 
-The REST API documentation can be found on [llama-stack.readthedocs.io](https://llama-stack.readthedocs.io/en/latest/). The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [https://llama-stack.readthedocs.io/en/latest/references/api_reference/index.html](https://llama-stack.readthedocs.io/en/latest/references/api_reference/index.html). The full API of this library can be found in [api.md](api.md).
 
 It is generated with [Stainless](https://www.stainlessapi.com/).
 
