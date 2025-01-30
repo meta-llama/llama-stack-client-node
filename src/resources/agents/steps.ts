@@ -2,26 +2,24 @@
 
 import { APIResource } from '../../resource';
 import * as Core from '../../core';
-import * as StepsAPI from './steps';
 import * as AgentsAPI from './agents';
 
 export class Steps extends APIResource {
-  retrieve(params: StepRetrieveParams, options?: Core.RequestOptions): Core.APIPromise<AgentsStep> {
-    const { 'X-LlamaStack-ProviderData': xLlamaStackProviderData, ...query } = params;
-    return this._client.get('/agents/step/get', {
-      query,
-      ...options,
-      headers: {
-        ...(xLlamaStackProviderData != null ?
-          { 'X-LlamaStack-ProviderData': xLlamaStackProviderData }
-        : undefined),
-        ...options?.headers,
-      },
-    });
+  retrieve(
+    agentId: string,
+    sessionId: string,
+    turnId: string,
+    stepId: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<StepRetrieveResponse> {
+    return this._client.get(
+      `/v1/agents/${agentId}/session/${sessionId}/turn/${turnId}/step/${stepId}`,
+      options,
+    );
   }
 }
 
-export interface AgentsStep {
+export interface StepRetrieveResponse {
   step:
     | AgentsAPI.InferenceStep
     | AgentsAPI.ToolExecutionStep
@@ -29,30 +27,6 @@ export interface AgentsStep {
     | AgentsAPI.MemoryRetrievalStep;
 }
 
-export interface StepRetrieveParams {
-  /**
-   * Query param:
-   */
-  agent_id: string;
-
-  /**
-   * Query param:
-   */
-  step_id: string;
-
-  /**
-   * Query param:
-   */
-  turn_id: string;
-
-  /**
-   * Header param: JSON-encoded provider data which will be made available to the
-   * adapter servicing the API
-   */
-  'X-LlamaStack-ProviderData'?: string;
-}
-
-export namespace Steps {
-  export import AgentsStep = StepsAPI.AgentsStep;
-  export import StepRetrieveParams = StepsAPI.StepRetrieveParams;
+export declare namespace Steps {
+  export { type StepRetrieveResponse as StepRetrieveResponse };
 }

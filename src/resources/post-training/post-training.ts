@@ -2,45 +2,72 @@
 
 import { APIResource } from '../../resource';
 import * as Core from '../../core';
-import * as PostTrainingAPI from './post-training';
-import * as DatasetsAPI from '../datasets';
-import * as JobsAPI from './jobs';
+import * as JobAPI from './job';
+import {
+  Job,
+  JobArtifactsParams,
+  JobArtifactsResponse,
+  JobCancelParams,
+  JobListResponse,
+  JobStatusParams,
+  JobStatusResponse,
+} from './job';
 
 export class PostTraining extends APIResource {
-  jobs: JobsAPI.Jobs = new JobsAPI.Jobs(this._client);
+  job: JobAPI.Job = new JobAPI.Job(this._client);
 
   preferenceOptimize(
-    params: PostTrainingPreferenceOptimizeParams,
+    body: PostTrainingPreferenceOptimizeParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<PostTrainingJob> {
-    const { 'X-LlamaStack-ProviderData': xLlamaStackProviderData, ...body } = params;
-    return this._client.post('/post_training/preference_optimize', {
-      body,
-      ...options,
-      headers: {
-        ...(xLlamaStackProviderData != null ?
-          { 'X-LlamaStack-ProviderData': xLlamaStackProviderData }
-        : undefined),
-        ...options?.headers,
-      },
-    });
+    return this._client.post('/v1/post-training/preference-optimize', { body, ...options });
   }
 
   supervisedFineTune(
-    params: PostTrainingSupervisedFineTuneParams,
+    body: PostTrainingSupervisedFineTuneParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<PostTrainingJob> {
-    const { 'X-LlamaStack-ProviderData': xLlamaStackProviderData, ...body } = params;
-    return this._client.post('/post_training/supervised_fine_tune', {
-      body,
-      ...options,
-      headers: {
-        ...(xLlamaStackProviderData != null ?
-          { 'X-LlamaStack-ProviderData': xLlamaStackProviderData }
-        : undefined),
-        ...options?.headers,
-      },
-    });
+    return this._client.post('/v1/post-training/supervised-fine-tune', { body, ...options });
+  }
+}
+
+export type AlgorithmConfig = AlgorithmConfig.LoraFinetuningConfig | AlgorithmConfig.QatFinetuningConfig;
+
+export namespace AlgorithmConfig {
+  export interface LoraFinetuningConfig {
+    alpha: number;
+
+    apply_lora_to_mlp: boolean;
+
+    apply_lora_to_output: boolean;
+
+    lora_attn_modules: Array<string>;
+
+    rank: number;
+
+    type: 'LoRA';
+
+    quantize_base?: boolean;
+
+    use_dora?: boolean;
+  }
+
+  export interface QatFinetuningConfig {
+    group_size: number;
+
+    quantizer_name: string;
+
+    type: 'QAT';
+  }
+}
+
+export interface ListPostTrainingJobsResponse {
+  data: Array<ListPostTrainingJobsResponse.Data>;
+}
+
+export namespace ListPostTrainingJobsResponse {
+  export interface Data {
+    job_uuid: string;
   }
 }
 
@@ -49,61 +76,17 @@ export interface PostTrainingJob {
 }
 
 export interface PostTrainingPreferenceOptimizeParams {
-  /**
-   * Body param:
-   */
-  algorithm: 'dpo';
-
-  /**
-   * Body param:
-   */
   algorithm_config: PostTrainingPreferenceOptimizeParams.AlgorithmConfig;
 
-  /**
-   * Body param:
-   */
-  dataset: DatasetsAPI.TrainEvalDataset;
-
-  /**
-   * Body param:
-   */
   finetuned_model: string;
 
-  /**
-   * Body param:
-   */
   hyperparam_search_config: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
 
-  /**
-   * Body param:
-   */
   job_uuid: string;
 
-  /**
-   * Body param:
-   */
   logger_config: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
 
-  /**
-   * Body param:
-   */
-  optimizer_config: PostTrainingPreferenceOptimizeParams.OptimizerConfig;
-
-  /**
-   * Body param:
-   */
   training_config: PostTrainingPreferenceOptimizeParams.TrainingConfig;
-
-  /**
-   * Body param:
-   */
-  validation_dataset: DatasetsAPI.TrainEvalDataset;
-
-  /**
-   * Header param: JSON-encoded provider data which will be made available to the
-   * adapter servicing the API
-   */
-  'X-LlamaStack-ProviderData'?: string;
 }
 
 export namespace PostTrainingPreferenceOptimizeParams {
@@ -117,169 +100,155 @@ export namespace PostTrainingPreferenceOptimizeParams {
     reward_scale: number;
   }
 
-  export interface OptimizerConfig {
-    lr: number;
-
-    lr_min: number;
-
-    optimizer_type: 'adam' | 'adamw' | 'sgd';
-
-    weight_decay: number;
-  }
-
   export interface TrainingConfig {
-    batch_size: number;
+    data_config: TrainingConfig.DataConfig;
 
-    enable_activation_checkpointing: boolean;
+    gradient_accumulation_steps: number;
 
-    fsdp_cpu_offload: boolean;
+    max_steps_per_epoch: number;
 
-    memory_efficient_fsdp_wrap: boolean;
+    max_validation_steps: number;
 
     n_epochs: number;
 
-    n_iters: number;
+    optimizer_config: TrainingConfig.OptimizerConfig;
 
-    shuffle: boolean;
+    dtype?: string;
+
+    efficiency_config?: TrainingConfig.EfficiencyConfig;
+  }
+
+  export namespace TrainingConfig {
+    export interface DataConfig {
+      batch_size: number;
+
+      data_format: 'instruct' | 'dialog';
+
+      dataset_id: string;
+
+      shuffle: boolean;
+
+      packed?: boolean;
+
+      train_on_input?: boolean;
+
+      validation_dataset_id?: string;
+    }
+
+    export interface OptimizerConfig {
+      lr: number;
+
+      num_warmup_steps: number;
+
+      optimizer_type: 'adam' | 'adamw' | 'sgd';
+
+      weight_decay: number;
+    }
+
+    export interface EfficiencyConfig {
+      enable_activation_checkpointing?: boolean;
+
+      enable_activation_offloading?: boolean;
+
+      fsdp_cpu_offload?: boolean;
+
+      memory_efficient_fsdp_wrap?: boolean;
+    }
   }
 }
 
 export interface PostTrainingSupervisedFineTuneParams {
-  /**
-   * Body param:
-   */
-  algorithm: 'full' | 'lora' | 'qlora' | 'dora';
-
-  /**
-   * Body param:
-   */
-  algorithm_config:
-    | PostTrainingSupervisedFineTuneParams.LoraFinetuningConfig
-    | PostTrainingSupervisedFineTuneParams.QLoraFinetuningConfig
-    | PostTrainingSupervisedFineTuneParams.DoraFinetuningConfig;
-
-  /**
-   * Body param:
-   */
-  dataset: DatasetsAPI.TrainEvalDataset;
-
-  /**
-   * Body param:
-   */
   hyperparam_search_config: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
 
-  /**
-   * Body param:
-   */
   job_uuid: string;
 
-  /**
-   * Body param:
-   */
   logger_config: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
 
-  /**
-   * Body param:
-   */
   model: string;
 
-  /**
-   * Body param:
-   */
-  optimizer_config: PostTrainingSupervisedFineTuneParams.OptimizerConfig;
-
-  /**
-   * Body param:
-   */
   training_config: PostTrainingSupervisedFineTuneParams.TrainingConfig;
 
-  /**
-   * Body param:
-   */
-  validation_dataset: DatasetsAPI.TrainEvalDataset;
+  algorithm_config?: AlgorithmConfig;
 
-  /**
-   * Header param: JSON-encoded provider data which will be made available to the
-   * adapter servicing the API
-   */
-  'X-LlamaStack-ProviderData'?: string;
+  checkpoint_dir?: string;
 }
 
 export namespace PostTrainingSupervisedFineTuneParams {
-  export interface LoraFinetuningConfig {
-    alpha: number;
-
-    apply_lora_to_mlp: boolean;
-
-    apply_lora_to_output: boolean;
-
-    lora_attn_modules: Array<string>;
-
-    rank: number;
-  }
-
-  export interface QLoraFinetuningConfig {
-    alpha: number;
-
-    apply_lora_to_mlp: boolean;
-
-    apply_lora_to_output: boolean;
-
-    lora_attn_modules: Array<string>;
-
-    rank: number;
-  }
-
-  export interface DoraFinetuningConfig {
-    alpha: number;
-
-    apply_lora_to_mlp: boolean;
-
-    apply_lora_to_output: boolean;
-
-    lora_attn_modules: Array<string>;
-
-    rank: number;
-  }
-
-  export interface OptimizerConfig {
-    lr: number;
-
-    lr_min: number;
-
-    optimizer_type: 'adam' | 'adamw' | 'sgd';
-
-    weight_decay: number;
-  }
-
   export interface TrainingConfig {
-    batch_size: number;
+    data_config: TrainingConfig.DataConfig;
 
-    enable_activation_checkpointing: boolean;
+    gradient_accumulation_steps: number;
 
-    fsdp_cpu_offload: boolean;
+    max_steps_per_epoch: number;
 
-    memory_efficient_fsdp_wrap: boolean;
+    max_validation_steps: number;
 
     n_epochs: number;
 
-    n_iters: number;
+    optimizer_config: TrainingConfig.OptimizerConfig;
 
-    shuffle: boolean;
+    dtype?: string;
+
+    efficiency_config?: TrainingConfig.EfficiencyConfig;
+  }
+
+  export namespace TrainingConfig {
+    export interface DataConfig {
+      batch_size: number;
+
+      data_format: 'instruct' | 'dialog';
+
+      dataset_id: string;
+
+      shuffle: boolean;
+
+      packed?: boolean;
+
+      train_on_input?: boolean;
+
+      validation_dataset_id?: string;
+    }
+
+    export interface OptimizerConfig {
+      lr: number;
+
+      num_warmup_steps: number;
+
+      optimizer_type: 'adam' | 'adamw' | 'sgd';
+
+      weight_decay: number;
+    }
+
+    export interface EfficiencyConfig {
+      enable_activation_checkpointing?: boolean;
+
+      enable_activation_offloading?: boolean;
+
+      fsdp_cpu_offload?: boolean;
+
+      memory_efficient_fsdp_wrap?: boolean;
+    }
   }
 }
 
-export namespace PostTraining {
-  export import PostTrainingJob = PostTrainingAPI.PostTrainingJob;
-  export import PostTrainingPreferenceOptimizeParams = PostTrainingAPI.PostTrainingPreferenceOptimizeParams;
-  export import PostTrainingSupervisedFineTuneParams = PostTrainingAPI.PostTrainingSupervisedFineTuneParams;
-  export import Jobs = JobsAPI.Jobs;
-  export import PostTrainingJobArtifacts = JobsAPI.PostTrainingJobArtifacts;
-  export import PostTrainingJobLogStream = JobsAPI.PostTrainingJobLogStream;
-  export import PostTrainingJobStatus = JobsAPI.PostTrainingJobStatus;
-  export import JobListParams = JobsAPI.JobListParams;
-  export import JobArtifactsParams = JobsAPI.JobArtifactsParams;
-  export import JobCancelParams = JobsAPI.JobCancelParams;
-  export import JobLogsParams = JobsAPI.JobLogsParams;
-  export import JobStatusParams = JobsAPI.JobStatusParams;
+PostTraining.Job = Job;
+
+export declare namespace PostTraining {
+  export {
+    type AlgorithmConfig as AlgorithmConfig,
+    type ListPostTrainingJobsResponse as ListPostTrainingJobsResponse,
+    type PostTrainingJob as PostTrainingJob,
+    type PostTrainingPreferenceOptimizeParams as PostTrainingPreferenceOptimizeParams,
+    type PostTrainingSupervisedFineTuneParams as PostTrainingSupervisedFineTuneParams,
+  };
+
+  export {
+    Job as Job,
+    type JobListResponse as JobListResponse,
+    type JobArtifactsResponse as JobArtifactsResponse,
+    type JobStatusResponse as JobStatusResponse,
+    type JobArtifactsParams as JobArtifactsParams,
+    type JobCancelParams as JobCancelParams,
+    type JobStatusParams as JobStatusParams,
+  };
 }

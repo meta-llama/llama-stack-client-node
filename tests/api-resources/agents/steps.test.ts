@@ -6,12 +6,8 @@ import { Response } from 'node-fetch';
 const client = new LlamaStackClient({ baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010' });
 
 describe('resource steps', () => {
-  test('retrieve: only required params', async () => {
-    const responsePromise = client.agents.steps.retrieve({
-      agent_id: 'agent_id',
-      step_id: 'step_id',
-      turn_id: 'turn_id',
-    });
+  test('retrieve', async () => {
+    const responsePromise = client.agents.steps.retrieve('agent_id', 'session_id', 'turn_id', 'step_id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -21,12 +17,12 @@ describe('resource steps', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('retrieve: required and optional params', async () => {
-    const response = await client.agents.steps.retrieve({
-      agent_id: 'agent_id',
-      step_id: 'step_id',
-      turn_id: 'turn_id',
-      'X-LlamaStack-ProviderData': 'X-LlamaStack-ProviderData',
-    });
+  test('retrieve: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.agents.steps.retrieve('agent_id', 'session_id', 'turn_id', 'step_id', {
+        path: '/_stainless_unknown_path',
+      }),
+    ).rejects.toThrow(LlamaStackClient.NotFoundError);
   });
 });

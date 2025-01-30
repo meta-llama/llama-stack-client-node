@@ -2,83 +2,160 @@
 
 export * from './shared';
 export {
-  BatchChatCompletion,
-  BatchInferenceChatCompletionParams,
-  BatchInferenceCompletionParams,
+  Agents,
+  type InferenceStep,
+  type MemoryRetrievalStep,
+  type ShieldCallStep,
+  type ToolExecutionStep,
+  type ToolResponse,
+  type AgentCreateResponse,
+  type AgentCreateParams,
+} from './agents/agents';
+export {
   BatchInference,
+  type BatchInferenceChatCompletionResponse,
+  type BatchInferenceChatCompletionParams,
+  type BatchInferenceCompletionParams,
 } from './batch-inference';
 export {
-  ChatCompletionStreamChunk,
-  CompletionStreamChunk,
-  TokenLogProbs,
-  InferenceChatCompletionResponse,
-  InferenceCompletionResponse,
-  InferenceChatCompletionParams,
-  InferenceChatCompletionParamsNonStreaming,
-  InferenceChatCompletionParamsStreaming,
-  InferenceCompletionParams,
+  Datasetio,
+  type PaginatedRowsResult,
+  type DatasetioAppendRowsParams,
+  type DatasetioGetRowsPaginatedParams,
+} from './datasetio';
+export {
+  Datasets,
+  type ListDatasetsResponse,
+  type DatasetRetrieveResponse,
+  type DatasetListResponse,
+  type DatasetRegisterParams,
+} from './datasets';
+export {
+  Eval,
+  type EvalCandidate,
+  type EvalTaskConfig,
+  type EvaluateResponse,
+  type Job,
+  type EvalEvaluateRowsParams,
+  type EvalRunEvalParams,
+} from './eval/eval';
+export {
+  EvalTasks,
+  type EvalTask,
+  type ListEvalTasksResponse,
+  type EvalTaskListResponse,
+  type EvalTaskRegisterParams,
+} from './eval-tasks';
+export {
   Inference,
-} from './inference/inference';
-export { EvaluationJob, Evaluate } from './evaluate/evaluate';
-export { EvaluationSummarizationParams, EvaluationTextGenerationParams, Evaluations } from './evaluations';
+  type CompletionResponse,
+  type EmbeddingsResponse,
+  type TokenLogProbs,
+  type InferenceChatCompletionResponse,
+  type InferenceCompletionResponse,
+  type InferenceChatCompletionParams,
+  type InferenceChatCompletionParamsNonStreaming,
+  type InferenceChatCompletionParamsStreaming,
+  type InferenceCompletionParams,
+  type InferenceCompletionParamsNonStreaming,
+  type InferenceCompletionParamsStreaming,
+  type InferenceEmbeddingsParams,
+} from './inference';
+export { Inspect, type HealthInfo, type ProviderInfo, type RouteInfo, type VersionInfo } from './inspect';
 export {
-  InferenceStep,
-  MemoryRetrievalStep,
-  RestAPIExecutionConfig,
-  ShieldCallStep,
-  ToolExecutionStep,
-  ToolParamDefinition,
-  AgentCreateResponse,
-  AgentCreateParams,
-  AgentDeleteParams,
-  Agents,
-} from './agents/agents';
-export { MemoryBankSpec, MemoryBankListParams, MemoryBankGetParams, MemoryBanks } from './memory-banks';
-export { ModelServingSpec, ModelListParams, ModelGetParams, Models } from './models';
+  Models,
+  type ListModelsResponse,
+  type Model,
+  type ModelListResponse,
+  type ModelRegisterParams,
+} from './models';
 export {
-  PostTrainingJob,
-  PostTrainingPreferenceOptimizeParams,
-  PostTrainingSupervisedFineTuneParams,
   PostTraining,
+  type AlgorithmConfig,
+  type ListPostTrainingJobsResponse,
+  type PostTrainingJob,
+  type PostTrainingPreferenceOptimizeParams,
+  type PostTrainingSupervisedFineTuneParams,
 } from './post-training/post-training';
+export { Providers, type ListProvidersResponse, type ProviderListResponse } from './providers';
+export { Routes, type ListRoutesResponse, type RouteListResponse } from './routes';
+export { Safety, type RunShieldResponse, type SafetyRunShieldParams } from './safety';
 export {
-  QueryDocuments,
-  MemoryCreateResponse,
-  MemoryRetrieveResponse,
-  MemoryListResponse,
-  MemoryDropResponse,
-  MemoryCreateParams,
-  MemoryRetrieveParams,
-  MemoryUpdateParams,
-  MemoryListParams,
-  MemoryDropParams,
-  MemoryInsertParams,
-  MemoryQueryParams,
-  Memory,
-} from './memory/memory';
+  Scoring,
+  type ScoringScoreResponse,
+  type ScoringScoreBatchResponse,
+  type ScoringScoreParams,
+  type ScoringScoreBatchParams,
+} from './scoring';
 export {
-  RewardScoring,
-  ScoredDialogGenerations,
-  RewardScoringScoreParams,
-  RewardScoringResource,
-} from './reward-scoring';
-export { RunSheidResponse, SafetyRunShieldParams, Safety } from './safety';
-export { ShieldSpec, ShieldListParams, ShieldGetParams, Shields } from './shields';
+  ScoringFunctions,
+  type ListScoringFunctionsResponse,
+  type ScoringFn,
+  type ScoringFnParams,
+  type ScoringFunctionListResponse,
+  type ScoringFunctionRegisterParams,
+} from './scoring-functions';
+export {
+  Shields,
+  type ListShieldsResponse,
+  type Shield,
+  type ShieldListResponse,
+  type ShieldRegisterParams,
+} from './shields';
 export {
   SyntheticDataGeneration,
-  SyntheticDataGenerationGenerateParams,
-  SyntheticDataGenerationResource,
+  type SyntheticDataGenerationResponse,
+  type SyntheticDataGenerationGenerateParams,
 } from './synthetic-data-generation';
 export {
-  TelemetryGetTraceResponse,
-  TelemetryGetTraceParams,
-  TelemetryLogParams,
   Telemetry,
+  type Event,
+  type QueryCondition,
+  type QuerySpansResponse,
+  type SpanWithStatus,
+  type Trace,
+  type TelemetryGetSpanResponse,
+  type TelemetryGetSpanTreeResponse,
+  type TelemetryQuerySpansResponse,
+  type TelemetryQueryTracesResponse,
+  type TelemetryGetSpanTreeParams,
+  type TelemetryLogEventParams,
+  type TelemetryQuerySpansParams,
+  type TelemetryQueryTracesParams,
+  type TelemetrySaveSpansToDatasetParams,
 } from './telemetry';
 export {
-  TrainEvalDataset,
-  DatasetCreateParams,
-  DatasetDeleteParams,
-  DatasetGetParams,
-  Datasets,
-} from './datasets';
+  ToolRuntime,
+  type ToolDef,
+  type ToolInvocationResult,
+  type ToolRuntimeInvokeToolParams,
+  type ToolRuntimeListToolsParams,
+} from './tool-runtime/tool-runtime';
+export {
+  Toolgroups,
+  type ListToolGroupsResponse,
+  type ToolGroup,
+  type ToolgroupListResponse,
+  type ToolgroupRegisterParams,
+} from './toolgroups';
+export {
+  Tools,
+  type ListToolsResponse,
+  type Tool,
+  type ToolListResponse,
+  type ToolListParams,
+} from './tools';
+export {
+  VectorDBs,
+  type ListVectorDBsResponse,
+  type VectorDBRetrieveResponse,
+  type VectorDBListResponse,
+  type VectorDBRegisterResponse,
+  type VectorDBRegisterParams,
+} from './vector-dbs';
+export {
+  VectorIo,
+  type QueryChunksResponse,
+  type VectorIoInsertParams,
+  type VectorIoQueryParams,
+} from './vector-io';

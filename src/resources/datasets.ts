@@ -2,109 +2,115 @@
 
 import { APIResource } from '../resource';
 import * as Core from '../core';
-import * as DatasetsAPI from './datasets';
+import * as Shared from './shared';
 
 export class Datasets extends APIResource {
-  create(params: DatasetCreateParams, options?: Core.RequestOptions): Core.APIPromise<void> {
-    const { 'X-LlamaStack-ProviderData': xLlamaStackProviderData, ...body } = params;
-    return this._client.post('/datasets/create', {
+  retrieve(
+    datasetId: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DatasetRetrieveResponse | null> {
+    return this._client.get(`/v1/datasets/${datasetId}`, options);
+  }
+
+  list(options?: Core.RequestOptions): Core.APIPromise<DatasetListResponse> {
+    return (
+      this._client.get('/v1/datasets', options) as Core.APIPromise<{ data: DatasetListResponse }>
+    )._thenUnwrap((obj) => obj.data);
+  }
+
+  register(body: DatasetRegisterParams, options?: Core.RequestOptions): Core.APIPromise<void> {
+    return this._client.post('/v1/datasets', {
       body,
       ...options,
-      headers: {
-        Accept: '*/*',
-        ...(xLlamaStackProviderData != null ?
-          { 'X-LlamaStack-ProviderData': xLlamaStackProviderData }
-        : undefined),
-        ...options?.headers,
-      },
+      headers: { Accept: '*/*', ...options?.headers },
     });
   }
 
-  delete(params: DatasetDeleteParams, options?: Core.RequestOptions): Core.APIPromise<void> {
-    const { 'X-LlamaStack-ProviderData': xLlamaStackProviderData, ...body } = params;
-    return this._client.post('/datasets/delete', {
-      body,
+  unregister(datasetId: string, options?: Core.RequestOptions): Core.APIPromise<void> {
+    return this._client.delete(`/v1/datasets/${datasetId}`, {
       ...options,
-      headers: {
-        Accept: '*/*',
-        ...(xLlamaStackProviderData != null ?
-          { 'X-LlamaStack-ProviderData': xLlamaStackProviderData }
-        : undefined),
-        ...options?.headers,
-      },
-    });
-  }
-
-  get(params: DatasetGetParams, options?: Core.RequestOptions): Core.APIPromise<TrainEvalDataset> {
-    const { 'X-LlamaStack-ProviderData': xLlamaStackProviderData, ...query } = params;
-    return this._client.get('/datasets/get', {
-      query,
-      ...options,
-      headers: {
-        ...(xLlamaStackProviderData != null ?
-          { 'X-LlamaStack-ProviderData': xLlamaStackProviderData }
-        : undefined),
-        ...options?.headers,
-      },
+      headers: { Accept: '*/*', ...options?.headers },
     });
   }
 }
 
-export interface TrainEvalDataset {
-  columns: Record<string, 'dialog' | 'text' | 'media' | 'number' | 'json'>;
+export interface ListDatasetsResponse {
+  data: Array<ListDatasetsResponse.Data>;
+}
 
-  content_url: string;
+export namespace ListDatasetsResponse {
+  export interface Data {
+    dataset_schema: Record<string, Shared.ParamType>;
+
+    identifier: string;
+
+    metadata: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
+
+    provider_id: string;
+
+    provider_resource_id: string;
+
+    type: 'dataset';
+
+    url: Shared.URL;
+  }
+}
+
+export interface DatasetRetrieveResponse {
+  dataset_schema: Record<string, Shared.ParamType>;
+
+  identifier: string;
+
+  metadata: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
+
+  provider_id: string;
+
+  provider_resource_id: string;
+
+  type: 'dataset';
+
+  url: Shared.URL;
+}
+
+export type DatasetListResponse = Array<DatasetListResponse.DatasetListResponseItem>;
+
+export namespace DatasetListResponse {
+  export interface DatasetListResponseItem {
+    dataset_schema: Record<string, Shared.ParamType>;
+
+    identifier: string;
+
+    metadata: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
+
+    provider_id: string;
+
+    provider_resource_id: string;
+
+    type: 'dataset';
+
+    url: Shared.URL;
+  }
+}
+
+export interface DatasetRegisterParams {
+  dataset_id: string;
+
+  dataset_schema: Record<string, Shared.ParamType>;
+
+  url: Shared.URL;
 
   metadata?: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
+
+  provider_dataset_id?: string;
+
+  provider_id?: string;
 }
 
-export interface DatasetCreateParams {
-  /**
-   * Body param:
-   */
-  dataset: TrainEvalDataset;
-
-  /**
-   * Body param:
-   */
-  uuid: string;
-
-  /**
-   * Header param: JSON-encoded provider data which will be made available to the
-   * adapter servicing the API
-   */
-  'X-LlamaStack-ProviderData'?: string;
-}
-
-export interface DatasetDeleteParams {
-  /**
-   * Body param:
-   */
-  dataset_uuid: string;
-
-  /**
-   * Header param: JSON-encoded provider data which will be made available to the
-   * adapter servicing the API
-   */
-  'X-LlamaStack-ProviderData'?: string;
-}
-
-export interface DatasetGetParams {
-  /**
-   * Query param:
-   */
-  dataset_uuid: string;
-
-  /**
-   * Header param: JSON-encoded provider data which will be made available to the
-   * adapter servicing the API
-   */
-  'X-LlamaStack-ProviderData'?: string;
-}
-
-export namespace Datasets {
-  export import TrainEvalDataset = DatasetsAPI.TrainEvalDataset;
-  export import DatasetCreateParams = DatasetsAPI.DatasetCreateParams;
-  export import DatasetDeleteParams = DatasetsAPI.DatasetDeleteParams;
-  export import DatasetGetParams = DatasetsAPI.DatasetGetParams;
+export declare namespace Datasets {
+  export {
+    type ListDatasetsResponse as ListDatasetsResponse,
+    type DatasetRetrieveResponse as DatasetRetrieveResponse,
+    type DatasetListResponse as DatasetListResponse,
+    type DatasetRegisterParams as DatasetRegisterParams,
+  };
 }

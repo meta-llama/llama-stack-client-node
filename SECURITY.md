@@ -20,7 +20,7 @@ or products provided by Llama Stack Client please follow the respective company'
 
 ### Llama Stack Client Terms and Policies
 
-Please contact dev-feedback@llama-stack-client.com for any questions or concerns regarding security of our services.
+Please contact llamastack@meta.com for any questions or concerns regarding security of our services.
 
 ---
 

@@ -91,6 +91,11 @@ describe('instantiate client', () => {
     expect(response).toEqual({ url: 'http://localhost:5000/foo', custom: true });
   });
 
+  test('explicit global fetch', async () => {
+    // make sure the global fetch type is assignable to our Fetch type
+    const client = new LlamaStackClient({ baseURL: 'http://localhost:5000/', fetch: defaultFetch });
+  });
+
   test('custom signal', async () => {
     const client = new LlamaStackClient({
       baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
@@ -114,6 +119,19 @@ describe('instantiate client', () => {
 
     await expect(client.get('/foo', { signal: controller.signal })).rejects.toThrowError(APIUserAbortError);
     expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  test('normalized method', async () => {
+    let capturedRequest: RequestInit | undefined;
+    const testFetch = async (url: RequestInfo, init: RequestInit = {}): Promise<Response> => {
+      capturedRequest = init;
+      return new Response(JSON.stringify({}), { headers: { 'Content-Type': 'application/json' } });
+    };
+
+    const client = new LlamaStackClient({ baseURL: 'http://localhost:5000/', fetch: testFetch });
+
+    await client.patch('/foo');
+    expect(capturedRequest?.method).toEqual('PATCH');
   });
 
   describe('baseUrl', () => {
@@ -145,24 +163,13 @@ describe('instantiate client', () => {
     test('empty env variable', () => {
       process.env['LLAMA_STACK_CLIENT_BASE_URL'] = ''; // empty
       const client = new LlamaStackClient({});
-      expect(client.baseURL).toEqual('http://any-hosted-llama-stack-client.com');
+      expect(client.baseURL).toEqual('http://any-hosted-llama-stack.com');
     });
 
     test('blank env variable', () => {
       process.env['LLAMA_STACK_CLIENT_BASE_URL'] = '  '; // blank
       const client = new LlamaStackClient({});
-      expect(client.baseURL).toEqual('http://any-hosted-llama-stack-client.com');
-    });
-
-    test('env variable with environment', () => {
-      process.env['LLAMA_STACK_CLIENT_BASE_URL'] = 'https://example.com/from_env';
-
-      expect(() => new LlamaStackClient({ environment: 'production' })).toThrowErrorMatchingInlineSnapshot(
-        `"Ambiguous URL; The \`baseURL\` option (or LLAMA_STACK_CLIENT_BASE_URL env var) and the \`environment\` option are given. If you want to use the environment you must pass baseURL: null"`,
-      );
-
-      const client = new LlamaStackClient({ baseURL: null, environment: 'production' });
-      expect(client.baseURL).toEqual('http://any-hosted-llama-stack-client.com');
+      expect(client.baseURL).toEqual('http://any-hosted-llama-stack.com');
     });
   });
 
@@ -255,6 +262,96 @@ describe('retries', () => {
 
     expect((capturedRequest!.headers as Headers)['x-stainless-retry-count']).toEqual('2');
     expect(count).toEqual(3);
+  });
+
+  test('omit retry count header', async () => {
+    let count = 0;
+    let capturedRequest: RequestInit | undefined;
+    const testFetch = async (url: RequestInfo, init: RequestInit = {}): Promise<Response> => {
+      count++;
+      if (count <= 2) {
+        return new Response(undefined, {
+          status: 429,
+          headers: {
+            'Retry-After': '0.1',
+          },
+        });
+      }
+      capturedRequest = init;
+      return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
+    };
+    const client = new LlamaStackClient({ fetch: testFetch, maxRetries: 4 });
+
+    expect(
+      await client.request({
+        path: '/foo',
+        method: 'get',
+        headers: { 'X-Stainless-Retry-Count': null },
+      }),
+    ).toEqual({ a: 1 });
+
+    expect(capturedRequest!.headers as Headers).not.toHaveProperty('x-stainless-retry-count');
+  });
+
+  test('omit retry count header by default', async () => {
+    let count = 0;
+    let capturedRequest: RequestInit | undefined;
+    const testFetch = async (url: RequestInfo, init: RequestInit = {}): Promise<Response> => {
+      count++;
+      if (count <= 2) {
+        return new Response(undefined, {
+          status: 429,
+          headers: {
+            'Retry-After': '0.1',
+          },
+        });
+      }
+      capturedRequest = init;
+      return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
+    };
+    const client = new LlamaStackClient({
+      fetch: testFetch,
+      maxRetries: 4,
+      defaultHeaders: { 'X-Stainless-Retry-Count': null },
+    });
+
+    expect(
+      await client.request({
+        path: '/foo',
+        method: 'get',
+      }),
+    ).toEqual({ a: 1 });
+
+    expect(capturedRequest!.headers as Headers).not.toHaveProperty('x-stainless-retry-count');
+  });
+
+  test('overwrite retry count header', async () => {
+    let count = 0;
+    let capturedRequest: RequestInit | undefined;
+    const testFetch = async (url: RequestInfo, init: RequestInit = {}): Promise<Response> => {
+      count++;
+      if (count <= 2) {
+        return new Response(undefined, {
+          status: 429,
+          headers: {
+            'Retry-After': '0.1',
+          },
+        });
+      }
+      capturedRequest = init;
+      return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
+    };
+    const client = new LlamaStackClient({ fetch: testFetch, maxRetries: 4 });
+
+    expect(
+      await client.request({
+        path: '/foo',
+        method: 'get',
+        headers: { 'X-Stainless-Retry-Count': '42' },
+      }),
+    ).toEqual({ a: 1 });
+
+    expect((capturedRequest!.headers as Headers)['x-stainless-retry-count']).toBe('42');
   });
 
   test('retry on 429 with retry-after', async () => {

@@ -1,27 +1,165 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
+import { type Agent } from './_shims/index';
+import * as qs from './internal/qs';
+import * as Core from './core';
 import * as Errors from './error';
 import * as Uploads from './uploads';
-import { type Agent } from './_shims/index';
-import * as Core from './core';
 import * as API from './resources/index';
-
-const environments = {
-  production: 'http://any-hosted-llama-stack-client.com',
-  sandbox: 'https://example.com',
-};
-type Environment = keyof typeof environments;
+import {
+  BatchInference,
+  BatchInferenceChatCompletionParams,
+  BatchInferenceChatCompletionResponse,
+  BatchInferenceCompletionParams,
+} from './resources/batch-inference';
+import {
+  Datasetio,
+  DatasetioAppendRowsParams,
+  DatasetioGetRowsPaginatedParams,
+  PaginatedRowsResult,
+} from './resources/datasetio';
+import {
+  DatasetListResponse,
+  DatasetRegisterParams,
+  DatasetRetrieveResponse,
+  Datasets,
+  ListDatasetsResponse,
+} from './resources/datasets';
+import {
+  EvalTask,
+  EvalTaskListResponse,
+  EvalTaskRegisterParams,
+  EvalTasks,
+  ListEvalTasksResponse,
+} from './resources/eval-tasks';
+import {
+  CompletionResponse,
+  EmbeddingsResponse,
+  Inference,
+  InferenceChatCompletionParams,
+  InferenceChatCompletionParamsNonStreaming,
+  InferenceChatCompletionParamsStreaming,
+  InferenceChatCompletionResponse,
+  InferenceCompletionParams,
+  InferenceCompletionParamsNonStreaming,
+  InferenceCompletionParamsStreaming,
+  InferenceCompletionResponse,
+  InferenceEmbeddingsParams,
+  TokenLogProbs,
+} from './resources/inference';
+import { HealthInfo, Inspect, ProviderInfo, RouteInfo, VersionInfo } from './resources/inspect';
+import {
+  ListModelsResponse,
+  Model,
+  ModelListResponse,
+  ModelRegisterParams,
+  Models,
+} from './resources/models';
+import { ListProvidersResponse, ProviderListResponse, Providers } from './resources/providers';
+import { ListRoutesResponse, RouteListResponse, Routes } from './resources/routes';
+import { RunShieldResponse, Safety, SafetyRunShieldParams } from './resources/safety';
+import {
+  Scoring,
+  ScoringScoreBatchParams,
+  ScoringScoreBatchResponse,
+  ScoringScoreParams,
+  ScoringScoreResponse,
+} from './resources/scoring';
+import {
+  ListScoringFunctionsResponse,
+  ScoringFn,
+  ScoringFnParams,
+  ScoringFunctionListResponse,
+  ScoringFunctionRegisterParams,
+  ScoringFunctions,
+} from './resources/scoring-functions';
+import {
+  ListShieldsResponse,
+  Shield,
+  ShieldListResponse,
+  ShieldRegisterParams,
+  Shields,
+} from './resources/shields';
+import {
+  SyntheticDataGeneration,
+  SyntheticDataGenerationGenerateParams,
+  SyntheticDataGenerationResponse,
+} from './resources/synthetic-data-generation';
+import {
+  Event,
+  QueryCondition,
+  QuerySpansResponse,
+  SpanWithStatus,
+  Telemetry,
+  TelemetryGetSpanResponse,
+  TelemetryGetSpanTreeParams,
+  TelemetryGetSpanTreeResponse,
+  TelemetryLogEventParams,
+  TelemetryQuerySpansParams,
+  TelemetryQuerySpansResponse,
+  TelemetryQueryTracesParams,
+  TelemetryQueryTracesResponse,
+  TelemetrySaveSpansToDatasetParams,
+  Trace,
+} from './resources/telemetry';
+import {
+  ListToolGroupsResponse,
+  ToolGroup,
+  ToolgroupListResponse,
+  ToolgroupRegisterParams,
+  Toolgroups,
+} from './resources/toolgroups';
+import { ListToolsResponse, Tool, ToolListParams, ToolListResponse, Tools } from './resources/tools';
+import {
+  ListVectorDBsResponse,
+  VectorDBListResponse,
+  VectorDBRegisterParams,
+  VectorDBRegisterResponse,
+  VectorDBRetrieveResponse,
+  VectorDBs,
+} from './resources/vector-dbs';
+import {
+  QueryChunksResponse,
+  VectorIo,
+  VectorIoInsertParams,
+  VectorIoQueryParams,
+} from './resources/vector-io';
+import {
+  AgentCreateParams,
+  AgentCreateResponse,
+  Agents,
+  InferenceStep,
+  MemoryRetrievalStep,
+  ShieldCallStep,
+  ToolExecutionStep,
+  ToolResponse,
+} from './resources/agents/agents';
+import {
+  Eval,
+  EvalCandidate,
+  EvalEvaluateRowsParams,
+  EvalRunEvalParams,
+  EvalTaskConfig,
+  EvaluateResponse,
+  Job,
+} from './resources/eval/eval';
+import {
+  AlgorithmConfig,
+  ListPostTrainingJobsResponse,
+  PostTraining,
+  PostTrainingJob,
+  PostTrainingPreferenceOptimizeParams,
+  PostTrainingSupervisedFineTuneParams,
+} from './resources/post-training/post-training';
+import {
+  ToolDef,
+  ToolInvocationResult,
+  ToolRuntime,
+  ToolRuntimeInvokeToolParams,
+  ToolRuntimeListToolsParams,
+} from './resources/tool-runtime/tool-runtime';
 
 export interface ClientOptions {
-  /**
-   * Specifies the environment to use for the API.
-   *
-   * Each environment maps to a different base URL:
-   * - `production` corresponds to `http://any-hosted-llama-stack-client.com`
-   * - `sandbox` corresponds to `https://example.com`
-   */
-  environment?: Environment;
-
   /**
    * Override the default base URL for the API, e.g., "https://api.example.com/v2/"
    *
@@ -36,7 +174,7 @@ export interface ClientOptions {
    * Note that request timeouts are retried by default, so in a worst-case scenario you may wait
    * much longer than this timeout before the promise succeeds or fails.
    */
-  timeout?: number;
+  timeout?: number | undefined;
 
   /**
    * An HTTP agent used to manage HTTP(S) connections.
@@ -44,7 +182,7 @@ export interface ClientOptions {
    * If not provided, an agent will be constructed by default in the Node.js environment,
    * otherwise no agent is used.
    */
-  httpAgent?: Agent;
+  httpAgent?: Agent | undefined;
 
   /**
    * Specify a custom `fetch` function implementation.
@@ -60,7 +198,7 @@ export interface ClientOptions {
    *
    * @default 2
    */
-  maxRetries?: number;
+  maxRetries?: number | undefined;
 
   /**
    * Default headers to include with every request to the API.
@@ -68,7 +206,7 @@ export interface ClientOptions {
    * These can be removed in individual requests by explicitly setting the
    * header to `undefined` or `null` in request options.
    */
-  defaultHeaders?: Core.Headers;
+  defaultHeaders?: Core.Headers | undefined;
 
   /**
    * Default query parameters to include with every request to the API.
@@ -76,7 +214,7 @@ export interface ClientOptions {
    * These can be removed in individual requests by explicitly setting the
    * param to `undefined` in request options.
    */
-  defaultQuery?: Core.DefaultQuery;
+  defaultQuery?: Core.DefaultQuery | undefined;
 }
 
 /**
@@ -88,8 +226,7 @@ export class LlamaStackClient extends Core.APIClient {
   /**
    * API Client for interfacing with the Llama Stack Client API.
    *
-   * @param {Environment} [opts.environment=production] - Specifies the environment URL to use for the API.
-   * @param {string} [opts.baseURL=process.env['LLAMA_STACK_CLIENT_BASE_URL'] ?? http://any-hosted-llama-stack-client.com] - Override the default base URL for the API.
+   * @param {string} [opts.baseURL=process.env['LLAMA_STACK_CLIENT_BASE_URL'] ?? http://any-hosted-llama-stack.com] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {number} [opts.httpAgent] - An HTTP agent used to manage HTTP(s) connections.
    * @param {Core.Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
@@ -100,18 +237,11 @@ export class LlamaStackClient extends Core.APIClient {
   constructor({ baseURL = Core.readEnv('LLAMA_STACK_CLIENT_BASE_URL'), ...opts }: ClientOptions = {}) {
     const options: ClientOptions = {
       ...opts,
-      baseURL,
-      environment: opts.environment ?? 'production',
+      baseURL: baseURL || `http://any-hosted-llama-stack.com`,
     };
 
-    if (baseURL && opts.environment) {
-      throw new Errors.LlamaStackClientError(
-        'Ambiguous URL; The `baseURL` option (or LLAMA_STACK_CLIENT_BASE_URL env var) and the `environment` option are given. If you want to use the environment you must pass baseURL: null',
-      );
-    }
-
     super({
-      baseURL: options.baseURL || environments[options.environment || 'production'],
+      baseURL: options.baseURL!,
       timeout: options.timeout ?? 60000 /* 1 minute */,
       httpAgent: options.httpAgent,
       maxRetries: options.maxRetries,
@@ -121,23 +251,29 @@ export class LlamaStackClient extends Core.APIClient {
     this._options = options;
   }
 
-  telemetry: API.Telemetry = new API.Telemetry(this);
+  toolgroups: API.Toolgroups = new API.Toolgroups(this);
+  tools: API.Tools = new API.Tools(this);
+  toolRuntime: API.ToolRuntime = new API.ToolRuntime(this);
   agents: API.Agents = new API.Agents(this);
-  datasets: API.Datasets = new API.Datasets(this);
-  evaluate: API.Evaluate = new API.Evaluate(this);
-  evaluations: API.Evaluations = new API.Evaluations(this);
-  inference: API.Inference = new API.Inference(this);
-  safety: API.Safety = new API.Safety(this);
-  memory: API.Memory = new API.Memory(this);
-  postTraining: API.PostTraining = new API.PostTraining(this);
-  rewardScoring: API.RewardScoringResource = new API.RewardScoringResource(this);
-  syntheticDataGeneration: API.SyntheticDataGenerationResource = new API.SyntheticDataGenerationResource(
-    this,
-  );
   batchInference: API.BatchInference = new API.BatchInference(this);
+  datasets: API.Datasets = new API.Datasets(this);
+  eval: API.Eval = new API.Eval(this);
+  inspect: API.Inspect = new API.Inspect(this);
+  inference: API.Inference = new API.Inference(this);
+  vectorIo: API.VectorIo = new API.VectorIo(this);
+  vectorDBs: API.VectorDBs = new API.VectorDBs(this);
   models: API.Models = new API.Models(this);
-  memoryBanks: API.MemoryBanks = new API.MemoryBanks(this);
+  postTraining: API.PostTraining = new API.PostTraining(this);
+  providers: API.Providers = new API.Providers(this);
+  routes: API.Routes = new API.Routes(this);
+  safety: API.Safety = new API.Safety(this);
   shields: API.Shields = new API.Shields(this);
+  syntheticDataGeneration: API.SyntheticDataGeneration = new API.SyntheticDataGeneration(this);
+  telemetry: API.Telemetry = new API.Telemetry(this);
+  datasetio: API.Datasetio = new API.Datasetio(this);
+  scoring: API.Scoring = new API.Scoring(this);
+  scoringFunctions: API.ScoringFunctions = new API.ScoringFunctions(this);
+  evalTasks: API.EvalTasks = new API.EvalTasks(this);
 
   protected override defaultQuery(): Core.DefaultQuery | undefined {
     return this._options.defaultQuery;
@@ -148,6 +284,10 @@ export class LlamaStackClient extends Core.APIClient {
       ...super.defaultHeaders(opts),
       ...this._options.defaultHeaders,
     };
+  }
+
+  protected override stringifyQuery(query: Record<string, unknown>): string {
+    return qs.stringify(query, { arrayFormat: 'comma' });
   }
 
   static LlamaStackClient = this;
@@ -171,7 +311,258 @@ export class LlamaStackClient extends Core.APIClient {
   static fileFromPath = Uploads.fileFromPath;
 }
 
-export const {
+LlamaStackClient.Toolgroups = Toolgroups;
+LlamaStackClient.Tools = Tools;
+LlamaStackClient.ToolRuntime = ToolRuntime;
+LlamaStackClient.Agents = Agents;
+LlamaStackClient.BatchInference = BatchInference;
+LlamaStackClient.Datasets = Datasets;
+LlamaStackClient.Eval = Eval;
+LlamaStackClient.Inspect = Inspect;
+LlamaStackClient.Inference = Inference;
+LlamaStackClient.VectorIo = VectorIo;
+LlamaStackClient.VectorDBs = VectorDBs;
+LlamaStackClient.Models = Models;
+LlamaStackClient.PostTraining = PostTraining;
+LlamaStackClient.Providers = Providers;
+LlamaStackClient.Routes = Routes;
+LlamaStackClient.Safety = Safety;
+LlamaStackClient.Shields = Shields;
+LlamaStackClient.SyntheticDataGeneration = SyntheticDataGeneration;
+LlamaStackClient.Telemetry = Telemetry;
+LlamaStackClient.Datasetio = Datasetio;
+LlamaStackClient.Scoring = Scoring;
+LlamaStackClient.ScoringFunctions = ScoringFunctions;
+LlamaStackClient.EvalTasks = EvalTasks;
+export declare namespace LlamaStackClient {
+  export type RequestOptions = Core.RequestOptions;
+
+  export {
+    Toolgroups as Toolgroups,
+    type ListToolGroupsResponse as ListToolGroupsResponse,
+    type ToolGroup as ToolGroup,
+    type ToolgroupListResponse as ToolgroupListResponse,
+    type ToolgroupRegisterParams as ToolgroupRegisterParams,
+  };
+
+  export {
+    Tools as Tools,
+    type ListToolsResponse as ListToolsResponse,
+    type Tool as Tool,
+    type ToolListResponse as ToolListResponse,
+    type ToolListParams as ToolListParams,
+  };
+
+  export {
+    ToolRuntime as ToolRuntime,
+    type ToolDef as ToolDef,
+    type ToolInvocationResult as ToolInvocationResult,
+    type ToolRuntimeInvokeToolParams as ToolRuntimeInvokeToolParams,
+    type ToolRuntimeListToolsParams as ToolRuntimeListToolsParams,
+  };
+
+  export {
+    Agents as Agents,
+    type InferenceStep as InferenceStep,
+    type MemoryRetrievalStep as MemoryRetrievalStep,
+    type ShieldCallStep as ShieldCallStep,
+    type ToolExecutionStep as ToolExecutionStep,
+    type ToolResponse as ToolResponse,
+    type AgentCreateResponse as AgentCreateResponse,
+    type AgentCreateParams as AgentCreateParams,
+  };
+
+  export {
+    BatchInference as BatchInference,
+    type BatchInferenceChatCompletionResponse as BatchInferenceChatCompletionResponse,
+    type BatchInferenceChatCompletionParams as BatchInferenceChatCompletionParams,
+    type BatchInferenceCompletionParams as BatchInferenceCompletionParams,
+  };
+
+  export {
+    Datasets as Datasets,
+    type ListDatasetsResponse as ListDatasetsResponse,
+    type DatasetRetrieveResponse as DatasetRetrieveResponse,
+    type DatasetListResponse as DatasetListResponse,
+    type DatasetRegisterParams as DatasetRegisterParams,
+  };
+
+  export {
+    Eval as Eval,
+    type EvalCandidate as EvalCandidate,
+    type EvalTaskConfig as EvalTaskConfig,
+    type EvaluateResponse as EvaluateResponse,
+    type Job as Job,
+    type EvalEvaluateRowsParams as EvalEvaluateRowsParams,
+    type EvalRunEvalParams as EvalRunEvalParams,
+  };
+
+  export {
+    Inspect as Inspect,
+    type HealthInfo as HealthInfo,
+    type ProviderInfo as ProviderInfo,
+    type RouteInfo as RouteInfo,
+    type VersionInfo as VersionInfo,
+  };
+
+  export {
+    Inference as Inference,
+    type CompletionResponse as CompletionResponse,
+    type EmbeddingsResponse as EmbeddingsResponse,
+    type TokenLogProbs as TokenLogProbs,
+    type InferenceChatCompletionResponse as InferenceChatCompletionResponse,
+    type InferenceCompletionResponse as InferenceCompletionResponse,
+    type InferenceChatCompletionParams as InferenceChatCompletionParams,
+    type InferenceChatCompletionParamsNonStreaming as InferenceChatCompletionParamsNonStreaming,
+    type InferenceChatCompletionParamsStreaming as InferenceChatCompletionParamsStreaming,
+    type InferenceCompletionParams as InferenceCompletionParams,
+    type InferenceCompletionParamsNonStreaming as InferenceCompletionParamsNonStreaming,
+    type InferenceCompletionParamsStreaming as InferenceCompletionParamsStreaming,
+    type InferenceEmbeddingsParams as InferenceEmbeddingsParams,
+  };
+
+  export {
+    VectorIo as VectorIo,
+    type QueryChunksResponse as QueryChunksResponse,
+    type VectorIoInsertParams as VectorIoInsertParams,
+    type VectorIoQueryParams as VectorIoQueryParams,
+  };
+
+  export {
+    VectorDBs as VectorDBs,
+    type ListVectorDBsResponse as ListVectorDBsResponse,
+    type VectorDBRetrieveResponse as VectorDBRetrieveResponse,
+    type VectorDBListResponse as VectorDBListResponse,
+    type VectorDBRegisterResponse as VectorDBRegisterResponse,
+    type VectorDBRegisterParams as VectorDBRegisterParams,
+  };
+
+  export {
+    Models as Models,
+    type ListModelsResponse as ListModelsResponse,
+    type Model as Model,
+    type ModelListResponse as ModelListResponse,
+    type ModelRegisterParams as ModelRegisterParams,
+  };
+
+  export {
+    PostTraining as PostTraining,
+    type AlgorithmConfig as AlgorithmConfig,
+    type ListPostTrainingJobsResponse as ListPostTrainingJobsResponse,
+    type PostTrainingJob as PostTrainingJob,
+    type PostTrainingPreferenceOptimizeParams as PostTrainingPreferenceOptimizeParams,
+    type PostTrainingSupervisedFineTuneParams as PostTrainingSupervisedFineTuneParams,
+  };
+
+  export {
+    Providers as Providers,
+    type ListProvidersResponse as ListProvidersResponse,
+    type ProviderListResponse as ProviderListResponse,
+  };
+
+  export {
+    Routes as Routes,
+    type ListRoutesResponse as ListRoutesResponse,
+    type RouteListResponse as RouteListResponse,
+  };
+
+  export {
+    Safety as Safety,
+    type RunShieldResponse as RunShieldResponse,
+    type SafetyRunShieldParams as SafetyRunShieldParams,
+  };
+
+  export {
+    Shields as Shields,
+    type ListShieldsResponse as ListShieldsResponse,
+    type Shield as Shield,
+    type ShieldListResponse as ShieldListResponse,
+    type ShieldRegisterParams as ShieldRegisterParams,
+  };
+
+  export {
+    SyntheticDataGeneration as SyntheticDataGeneration,
+    type SyntheticDataGenerationResponse as SyntheticDataGenerationResponse,
+    type SyntheticDataGenerationGenerateParams as SyntheticDataGenerationGenerateParams,
+  };
+
+  export {
+    Telemetry as Telemetry,
+    type Event as Event,
+    type QueryCondition as QueryCondition,
+    type QuerySpansResponse as QuerySpansResponse,
+    type SpanWithStatus as SpanWithStatus,
+    type Trace as Trace,
+    type TelemetryGetSpanResponse as TelemetryGetSpanResponse,
+    type TelemetryGetSpanTreeResponse as TelemetryGetSpanTreeResponse,
+    type TelemetryQuerySpansResponse as TelemetryQuerySpansResponse,
+    type TelemetryQueryTracesResponse as TelemetryQueryTracesResponse,
+    type TelemetryGetSpanTreeParams as TelemetryGetSpanTreeParams,
+    type TelemetryLogEventParams as TelemetryLogEventParams,
+    type TelemetryQuerySpansParams as TelemetryQuerySpansParams,
+    type TelemetryQueryTracesParams as TelemetryQueryTracesParams,
+    type TelemetrySaveSpansToDatasetParams as TelemetrySaveSpansToDatasetParams,
+  };
+
+  export {
+    Datasetio as Datasetio,
+    type PaginatedRowsResult as PaginatedRowsResult,
+    type DatasetioAppendRowsParams as DatasetioAppendRowsParams,
+    type DatasetioGetRowsPaginatedParams as DatasetioGetRowsPaginatedParams,
+  };
+
+  export {
+    Scoring as Scoring,
+    type ScoringScoreResponse as ScoringScoreResponse,
+    type ScoringScoreBatchResponse as ScoringScoreBatchResponse,
+    type ScoringScoreParams as ScoringScoreParams,
+    type ScoringScoreBatchParams as ScoringScoreBatchParams,
+  };
+
+  export {
+    ScoringFunctions as ScoringFunctions,
+    type ListScoringFunctionsResponse as ListScoringFunctionsResponse,
+    type ScoringFn as ScoringFn,
+    type ScoringFnParams as ScoringFnParams,
+    type ScoringFunctionListResponse as ScoringFunctionListResponse,
+    type ScoringFunctionRegisterParams as ScoringFunctionRegisterParams,
+  };
+
+  export {
+    EvalTasks as EvalTasks,
+    type EvalTask as EvalTask,
+    type ListEvalTasksResponse as ListEvalTasksResponse,
+    type EvalTaskListResponse as EvalTaskListResponse,
+    type EvalTaskRegisterParams as EvalTaskRegisterParams,
+  };
+
+  export type AgentConfig = API.AgentConfig;
+  export type BatchCompletion = API.BatchCompletion;
+  export type CompletionMessage = API.CompletionMessage;
+  export type ContentDelta = API.ContentDelta;
+  export type Document = API.Document;
+  export type InterleavedContent = API.InterleavedContent;
+  export type InterleavedContentItem = API.InterleavedContentItem;
+  export type Message = API.Message;
+  export type ParamType = API.ParamType;
+  export type QueryConfig = API.QueryConfig;
+  export type QueryGeneratorConfig = API.QueryGeneratorConfig;
+  export type QueryResult = API.QueryResult;
+  export type ResponseFormat = API.ResponseFormat;
+  export type ReturnType = API.ReturnType;
+  export type SafetyViolation = API.SafetyViolation;
+  export type SamplingParams = API.SamplingParams;
+  export type ScoringResult = API.ScoringResult;
+  export type SystemMessage = API.SystemMessage;
+  export type ToolCall = API.ToolCall;
+  export type ToolParamDefinition = API.ToolParamDefinition;
+  export type ToolResponseMessage = API.ToolResponseMessage;
+  export type URL = API.URL;
+  export type UserMessage = API.UserMessage;
+}
+
+export { toFile, fileFromPath } from './uploads';
+export {
   LlamaStackClientError,
   APIError,
   APIConnectionError,
@@ -185,114 +576,6 @@ export const {
   InternalServerError,
   PermissionDeniedError,
   UnprocessableEntityError,
-} = Errors;
-
-export import toFile = Uploads.toFile;
-export import fileFromPath = Uploads.fileFromPath;
-
-export namespace LlamaStackClient {
-  export import RequestOptions = Core.RequestOptions;
-
-  export import Telemetry = API.Telemetry;
-  export import TelemetryGetTraceResponse = API.TelemetryGetTraceResponse;
-  export import TelemetryGetTraceParams = API.TelemetryGetTraceParams;
-  export import TelemetryLogParams = API.TelemetryLogParams;
-
-  export import Agents = API.Agents;
-  export import InferenceStep = API.InferenceStep;
-  export import MemoryRetrievalStep = API.MemoryRetrievalStep;
-  export import RestAPIExecutionConfig = API.RestAPIExecutionConfig;
-  export import ShieldCallStep = API.ShieldCallStep;
-  export import ToolExecutionStep = API.ToolExecutionStep;
-  export import ToolParamDefinition = API.ToolParamDefinition;
-  export import AgentCreateResponse = API.AgentCreateResponse;
-  export import AgentCreateParams = API.AgentCreateParams;
-  export import AgentDeleteParams = API.AgentDeleteParams;
-
-  export import Datasets = API.Datasets;
-  export import TrainEvalDataset = API.TrainEvalDataset;
-  export import DatasetCreateParams = API.DatasetCreateParams;
-  export import DatasetDeleteParams = API.DatasetDeleteParams;
-  export import DatasetGetParams = API.DatasetGetParams;
-
-  export import Evaluate = API.Evaluate;
-  export import EvaluationJob = API.EvaluationJob;
-
-  export import Evaluations = API.Evaluations;
-  export import EvaluationSummarizationParams = API.EvaluationSummarizationParams;
-  export import EvaluationTextGenerationParams = API.EvaluationTextGenerationParams;
-
-  export import Inference = API.Inference;
-  export import ChatCompletionStreamChunk = API.ChatCompletionStreamChunk;
-  export import CompletionStreamChunk = API.CompletionStreamChunk;
-  export import TokenLogProbs = API.TokenLogProbs;
-  export import InferenceChatCompletionResponse = API.InferenceChatCompletionResponse;
-  export import InferenceCompletionResponse = API.InferenceCompletionResponse;
-  export import InferenceChatCompletionParams = API.InferenceChatCompletionParams;
-  export import InferenceChatCompletionParamsNonStreaming = API.InferenceChatCompletionParamsNonStreaming;
-  export import InferenceChatCompletionParamsStreaming = API.InferenceChatCompletionParamsStreaming;
-  export import InferenceCompletionParams = API.InferenceCompletionParams;
-
-  export import Safety = API.Safety;
-  export import RunSheidResponse = API.RunSheidResponse;
-  export import SafetyRunShieldParams = API.SafetyRunShieldParams;
-
-  export import Memory = API.Memory;
-  export import QueryDocuments = API.QueryDocuments;
-  export import MemoryCreateResponse = API.MemoryCreateResponse;
-  export import MemoryRetrieveResponse = API.MemoryRetrieveResponse;
-  export import MemoryListResponse = API.MemoryListResponse;
-  export import MemoryDropResponse = API.MemoryDropResponse;
-  export import MemoryCreateParams = API.MemoryCreateParams;
-  export import MemoryRetrieveParams = API.MemoryRetrieveParams;
-  export import MemoryUpdateParams = API.MemoryUpdateParams;
-  export import MemoryListParams = API.MemoryListParams;
-  export import MemoryDropParams = API.MemoryDropParams;
-  export import MemoryInsertParams = API.MemoryInsertParams;
-  export import MemoryQueryParams = API.MemoryQueryParams;
-
-  export import PostTraining = API.PostTraining;
-  export import PostTrainingJob = API.PostTrainingJob;
-  export import PostTrainingPreferenceOptimizeParams = API.PostTrainingPreferenceOptimizeParams;
-  export import PostTrainingSupervisedFineTuneParams = API.PostTrainingSupervisedFineTuneParams;
-
-  export import RewardScoringResource = API.RewardScoringResource;
-  export import RewardScoring = API.RewardScoring;
-  export import ScoredDialogGenerations = API.ScoredDialogGenerations;
-  export import RewardScoringScoreParams = API.RewardScoringScoreParams;
-
-  export import SyntheticDataGenerationResource = API.SyntheticDataGenerationResource;
-  export import SyntheticDataGeneration = API.SyntheticDataGeneration;
-  export import SyntheticDataGenerationGenerateParams = API.SyntheticDataGenerationGenerateParams;
-
-  export import BatchInference = API.BatchInference;
-  export import BatchChatCompletion = API.BatchChatCompletion;
-  export import BatchInferenceChatCompletionParams = API.BatchInferenceChatCompletionParams;
-  export import BatchInferenceCompletionParams = API.BatchInferenceCompletionParams;
-
-  export import Models = API.Models;
-  export import ModelServingSpec = API.ModelServingSpec;
-  export import ModelListParams = API.ModelListParams;
-  export import ModelGetParams = API.ModelGetParams;
-
-  export import MemoryBanks = API.MemoryBanks;
-  export import MemoryBankSpec = API.MemoryBankSpec;
-  export import MemoryBankListParams = API.MemoryBankListParams;
-  export import MemoryBankGetParams = API.MemoryBankGetParams;
-
-  export import Shields = API.Shields;
-  export import ShieldSpec = API.ShieldSpec;
-  export import ShieldListParams = API.ShieldListParams;
-  export import ShieldGetParams = API.ShieldGetParams;
-
-  export import Attachment = API.Attachment;
-  export import BatchCompletion = API.BatchCompletion;
-  export import CompletionMessage = API.CompletionMessage;
-  export import SamplingParams = API.SamplingParams;
-  export import SystemMessage = API.SystemMessage;
-  export import ToolCall = API.ToolCall;
-  export import ToolResponseMessage = API.ToolResponseMessage;
-  export import UserMessage = API.UserMessage;
-}
+} from './error';
 
 export default LlamaStackClient;

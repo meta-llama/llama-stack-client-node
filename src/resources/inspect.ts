@@ -1,0 +1,47 @@
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+
+import { APIResource } from '../resource';
+import * as Core from '../core';
+
+export class Inspect extends APIResource {
+  health(options?: Core.RequestOptions): Core.APIPromise<HealthInfo> {
+    return this._client.get('/v1/health', options);
+  }
+
+  version(options?: Core.RequestOptions): Core.APIPromise<VersionInfo> {
+    return this._client.get('/v1/version', options);
+  }
+}
+
+export interface HealthInfo {
+  status: string;
+}
+
+export interface ProviderInfo {
+  api: string;
+
+  provider_id: string;
+
+  provider_type: string;
+}
+
+export interface RouteInfo {
+  method: string;
+
+  provider_types: Array<string>;
+
+  route: string;
+}
+
+export interface VersionInfo {
+  version: string;
+}
+
+export declare namespace Inspect {
+  export {
+    type HealthInfo as HealthInfo,
+    type ProviderInfo as ProviderInfo,
+    type RouteInfo as RouteInfo,
+    type VersionInfo as VersionInfo,
+  };
+}
