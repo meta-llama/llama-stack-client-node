@@ -6,11 +6,6 @@ const LlamaStackClient = require('llama-stack-client').default;
 const client = new LlamaStackClient({ baseURL: 'http://localhost:8321' });
 
 async function main() {
-  // Check for Tavily API key
-  if (!process.env["TAVILY_SEARCH_API_KEY"]) {
-    console.log('Warning: TAVILY_SEARCH_API_KEY is not set; will not use websearch tool.');
-  }
-
   const availableModels = (await client.models.list())
     .filter((model: any) => model.model_type === 'llm')
     .map((model: any) => model.identifier);
@@ -21,6 +16,11 @@ async function main() {
   }
   const selectedModel = availableModels[0];
   console.log(`Using model: ${selectedModel}`);
+
+  // Check for Tavily API key
+  if (!process.env["TAVILY_SEARCH_API_KEY"]) {
+    console.log('Warning: TAVILY_SEARCH_API_KEY is not set; will not use websearch tool.');
+  }
 
   // Configure agent
   const agentConfig: AgentConfig = {
