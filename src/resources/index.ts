@@ -48,11 +48,10 @@ export {
 } from './eval-tasks';
 export {
   Inference,
+  type ChatCompletionResponseStreamChunk,
   type CompletionResponse,
   type EmbeddingsResponse,
   type TokenLogProbs,
-  type InferenceChatCompletionResponse,
-  type InferenceCompletionResponse,
   type InferenceChatCompletionParams,
   type InferenceChatCompletionParamsNonStreaming,
   type InferenceChatCompletionParamsStreaming,

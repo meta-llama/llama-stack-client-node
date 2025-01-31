@@ -20,10 +20,10 @@ export {
 export { Steps, type StepRetrieveResponse } from './steps';
 export {
   TurnResource,
+  type AgentTurnResponseStreamChunk,
   type Turn,
   type TurnResponseEvent,
   type TurnResponseEventPayload,
-  type TurnCreateResponse,
   type TurnCreateParams,
   type TurnCreateParamsNonStreaming,
   type TurnCreateParamsStreaming,

@@ -2,7 +2,6 @@
 
 import { APIResource } from '../resource';
 import * as Core from '../core';
-import * as InferenceAPI from './inference';
 import * as Shared from './shared';
 
 export class BatchInference extends APIResource {
@@ -22,21 +21,7 @@ export class BatchInference extends APIResource {
 }
 
 export interface BatchInferenceChatCompletionResponse {
-  batch: Array<BatchInferenceChatCompletionResponse.Batch>;
-}
-
-export namespace BatchInferenceChatCompletionResponse {
-  export interface Batch {
-    /**
-     * The complete response message
-     */
-    completion_message: Shared.CompletionMessage;
-
-    /**
-     * Optional log probabilities for generated tokens
-     */
-    logprobs?: Array<InferenceAPI.TokenLogProbs>;
-  }
+  batch: Array<Shared.ChatCompletionResponse>;
 }
 
 export interface BatchInferenceChatCompletionParams {

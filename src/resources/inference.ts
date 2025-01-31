@@ -14,25 +14,24 @@ export class Inference extends APIResource {
   chatCompletion(
     body: InferenceChatCompletionParamsNonStreaming,
     options?: Core.RequestOptions,
-  ): APIPromise<InferenceChatCompletionResponse>;
+  ): APIPromise<Shared.ChatCompletionResponse>;
   chatCompletion(
     body: InferenceChatCompletionParamsStreaming,
     options?: Core.RequestOptions,
-  ): APIPromise<Stream<InferenceChatCompletionResponse>>;
+  ): APIPromise<Stream<ChatCompletionResponseStreamChunk>>;
   chatCompletion(
     body: InferenceChatCompletionParamsBase,
     options?: Core.RequestOptions,
-  ): APIPromise<Stream<InferenceChatCompletionResponse> | InferenceChatCompletionResponse>;
+  ): APIPromise<Stream<ChatCompletionResponseStreamChunk> | Shared.ChatCompletionResponse>;
   chatCompletion(
     body: InferenceChatCompletionParams,
     options?: Core.RequestOptions,
-  ): APIPromise<InferenceChatCompletionResponse> | APIPromise<Stream<InferenceChatCompletionResponse>> {
+  ): APIPromise<Shared.ChatCompletionResponse> | APIPromise<Stream<ChatCompletionResponseStreamChunk>> {
     return this._client.post('/v1/inference/chat-completion', {
       body,
       ...options,
-      headers: { Accept: 'text/event-stream', ...options?.headers },
       stream: body.stream ?? false,
-    }) as APIPromise<InferenceChatCompletionResponse> | APIPromise<Stream<InferenceChatCompletionResponse>>;
+    }) as APIPromise<Shared.ChatCompletionResponse> | APIPromise<Stream<ChatCompletionResponseStreamChunk>>;
   }
 
   /**
@@ -41,25 +40,24 @@ export class Inference extends APIResource {
   completion(
     body: InferenceCompletionParamsNonStreaming,
     options?: Core.RequestOptions,
-  ): APIPromise<InferenceCompletionResponse>;
+  ): APIPromise<CompletionResponse>;
   completion(
     body: InferenceCompletionParamsStreaming,
     options?: Core.RequestOptions,
-  ): APIPromise<Stream<InferenceCompletionResponse>>;
+  ): APIPromise<Stream<CompletionResponse>>;
   completion(
     body: InferenceCompletionParamsBase,
     options?: Core.RequestOptions,
-  ): APIPromise<Stream<InferenceCompletionResponse> | InferenceCompletionResponse>;
+  ): APIPromise<Stream<CompletionResponse> | CompletionResponse>;
   completion(
     body: InferenceCompletionParams,
     options?: Core.RequestOptions,
-  ): APIPromise<InferenceCompletionResponse> | APIPromise<Stream<InferenceCompletionResponse>> {
+  ): APIPromise<CompletionResponse> | APIPromise<Stream<CompletionResponse>> {
     return this._client.post('/v1/inference/completion', {
       body,
       ...options,
-      headers: { Accept: 'text/event-stream', ...options?.headers },
       stream: body.stream ?? false,
-    }) as APIPromise<InferenceCompletionResponse> | APIPromise<Stream<InferenceCompletionResponse>>;
+    }) as APIPromise<CompletionResponse> | APIPromise<Stream<CompletionResponse>>;
   }
 
   /**
@@ -70,6 +68,41 @@ export class Inference extends APIResource {
     options?: Core.RequestOptions,
   ): Core.APIPromise<EmbeddingsResponse> {
     return this._client.post('/v1/inference/embeddings', { body, ...options });
+  }
+}
+
+export interface ChatCompletionResponseStreamChunk {
+  /**
+   * The event containing the new content
+   */
+  event: ChatCompletionResponseStreamChunk.Event;
+}
+
+export namespace ChatCompletionResponseStreamChunk {
+  /**
+   * The event containing the new content
+   */
+  export interface Event {
+    /**
+     * Content generated since last event. This can be one or more tokens, or a tool
+     * call.
+     */
+    delta: Shared.ContentDelta;
+
+    /**
+     * Type of the event
+     */
+    event_type: 'start' | 'complete' | 'progress';
+
+    /**
+     * Optional log probabilities for generated tokens
+     */
+    logprobs?: Array<InferenceAPI.TokenLogProbs>;
+
+    /**
+     * Optional reason why generation stopped, if complete
+     */
+    stop_reason?: 'end_of_turn' | 'end_of_message' | 'out_of_tokens';
   }
 }
 
@@ -104,82 +137,6 @@ export interface TokenLogProbs {
    * Dictionary mapping tokens to their log probabilities
    */
   logprobs_by_token: Record<string, number>;
-}
-
-export type InferenceChatCompletionResponse =
-  | InferenceChatCompletionResponse.ChatCompletionResponse
-  | InferenceChatCompletionResponse.ChatCompletionResponseStreamChunk;
-
-export namespace InferenceChatCompletionResponse {
-  export interface ChatCompletionResponse {
-    /**
-     * The complete response message
-     */
-    completion_message: Shared.CompletionMessage;
-
-    /**
-     * Optional log probabilities for generated tokens
-     */
-    logprobs?: Array<InferenceAPI.TokenLogProbs>;
-  }
-
-  export interface ChatCompletionResponseStreamChunk {
-    /**
-     * The event containing the new content
-     */
-    event: ChatCompletionResponseStreamChunk.Event;
-  }
-
-  export namespace ChatCompletionResponseStreamChunk {
-    /**
-     * The event containing the new content
-     */
-    export interface Event {
-      /**
-       * Content generated since last event. This can be one or more tokens, or a tool
-       * call.
-       */
-      delta: Shared.ContentDelta;
-
-      /**
-       * Type of the event
-       */
-      event_type: 'start' | 'complete' | 'progress';
-
-      /**
-       * Optional log probabilities for generated tokens
-       */
-      logprobs?: Array<InferenceAPI.TokenLogProbs>;
-
-      /**
-       * Optional reason why generation stopped, if complete
-       */
-      stop_reason?: 'end_of_turn' | 'end_of_message' | 'out_of_tokens';
-    }
-  }
-}
-
-export type InferenceCompletionResponse =
-  | CompletionResponse
-  | InferenceCompletionResponse.CompletionResponseStreamChunk;
-
-export namespace InferenceCompletionResponse {
-  export interface CompletionResponseStreamChunk {
-    /**
-     * New content generated since last chunk. This can be one or more tokens.
-     */
-    delta: string;
-
-    /**
-     * Optional log probabilities for generated tokens
-     */
-    logprobs?: Array<InferenceAPI.TokenLogProbs>;
-
-    /**
-     * Optional reason why generation stopped, if complete
-     */
-    stop_reason?: 'end_of_turn' | 'end_of_message' | 'out_of_tokens';
-  }
 }
 
 export type InferenceChatCompletionParams =
@@ -374,11 +331,10 @@ export interface InferenceEmbeddingsParams {
 
 export declare namespace Inference {
   export {
+    type ChatCompletionResponseStreamChunk as ChatCompletionResponseStreamChunk,
     type CompletionResponse as CompletionResponse,
     type EmbeddingsResponse as EmbeddingsResponse,
     type TokenLogProbs as TokenLogProbs,
-    type InferenceChatCompletionResponse as InferenceChatCompletionResponse,
-    type InferenceCompletionResponse as InferenceCompletionResponse,
     type InferenceChatCompletionParams as InferenceChatCompletionParams,
     type InferenceChatCompletionParamsNonStreaming as InferenceChatCompletionParamsNonStreaming,
     type InferenceChatCompletionParamsStreaming as InferenceChatCompletionParamsStreaming,
