@@ -2,7 +2,7 @@
 
 import { AgentConfig } from "llama-stack-client/resources/shared";
 
-const LlamaStackClient = require('llama-stack-client').default;
+import LlamaStackClient from 'llama-stack-client';
 const client = new LlamaStackClient({ baseURL: 'http://localhost:8321' });
 
 async function main() {

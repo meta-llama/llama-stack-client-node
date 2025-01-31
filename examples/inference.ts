@@ -1,6 +1,6 @@
 #!/usr/bin/env -S npm run tsn -T
 
-const LlamaStackClient = require('llama-stack-client').default;
+import LlamaStackClient from 'llama-stack-client';
 const client = new LlamaStackClient({ baseURL: 'http://localhost:8321' });
 
 async function main() {
@@ -22,7 +22,9 @@ async function main() {
     stream: true,
   });
   for await (const chunk of stream) {
-    process.stdout.write(chunk.event.delta.text || '');
+    if (chunk.event.delta.type === 'text') {
+      process.stdout.write(chunk.event.delta.text || '');
+    }
   }
   process.stdout.write('\n');
 }
