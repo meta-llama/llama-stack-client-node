@@ -6,8 +6,7 @@ import { Response } from 'node-fetch';
 const client = new LlamaStackClient({ baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010' });
 
 describe('resource inference', () => {
-  // skipped: currently no good way to test endpoints with content type text/event-stream, Prism mock server will fail
-  test.skip('chatCompletion: only required params', async () => {
+  test('chatCompletion: only required params', async () => {
     const responsePromise = client.inference.chatCompletion({
       messages: [{ content: 'string', role: 'user' }],
       model_id: 'model_id',
@@ -21,8 +20,7 @@ describe('resource inference', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // skipped: currently no good way to test endpoints with content type text/event-stream, Prism mock server will fail
-  test.skip('chatCompletion: required and optional params', async () => {
+  test('chatCompletion: required and optional params', async () => {
     const response = await client.inference.chatCompletion({
       messages: [{ content: 'string', role: 'user', context: 'string' }],
       model_id: 'model_id',
@@ -44,8 +42,7 @@ describe('resource inference', () => {
     });
   });
 
-  // skipped: currently no good way to test endpoints with content type text/event-stream, Prism mock server will fail
-  test.skip('completion: only required params', async () => {
+  test('completion: only required params', async () => {
     const responsePromise = client.inference.completion({ content: 'string', model_id: 'model_id' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -56,8 +53,7 @@ describe('resource inference', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // skipped: currently no good way to test endpoints with content type text/event-stream, Prism mock server will fail
-  test.skip('completion: required and optional params', async () => {
+  test('completion: required and optional params', async () => {
     const response = await client.inference.completion({
       content: 'string',
       model_id: 'model_id',

@@ -14,31 +14,30 @@ export class TurnResource extends APIResource {
     sessionId: string,
     body: TurnCreateParamsNonStreaming,
     options?: Core.RequestOptions,
-  ): APIPromise<TurnCreateResponse>;
+  ): APIPromise<Turn>;
   create(
     agentId: string,
     sessionId: string,
     body: TurnCreateParamsStreaming,
     options?: Core.RequestOptions,
-  ): APIPromise<Stream<TurnCreateResponse>>;
+  ): APIPromise<Stream<AgentTurnResponseStreamChunk>>;
   create(
     agentId: string,
     sessionId: string,
     body: TurnCreateParamsBase,
     options?: Core.RequestOptions,
-  ): APIPromise<Stream<TurnCreateResponse> | TurnCreateResponse>;
+  ): APIPromise<Stream<AgentTurnResponseStreamChunk> | Turn>;
   create(
     agentId: string,
     sessionId: string,
     body: TurnCreateParams,
     options?: Core.RequestOptions,
-  ): APIPromise<TurnCreateResponse> | APIPromise<Stream<TurnCreateResponse>> {
+  ): APIPromise<Turn> | APIPromise<Stream<AgentTurnResponseStreamChunk>> {
     return this._client.post(`/v1/agents/${agentId}/session/${sessionId}/turn`, {
       body,
       ...options,
-      headers: { Accept: 'text/event-stream', ...options?.headers },
       stream: body.stream ?? false,
-    }) as APIPromise<TurnCreateResponse> | APIPromise<Stream<TurnCreateResponse>>;
+    }) as APIPromise<Turn> | APIPromise<Stream<AgentTurnResponseStreamChunk>>;
   }
 
   retrieve(
@@ -49,6 +48,10 @@ export class TurnResource extends APIResource {
   ): Core.APIPromise<Turn> {
     return this._client.get(`/v1/agents/${agentId}/session/${sessionId}/turn/${turnId}`, options);
   }
+}
+
+export interface AgentTurnResponseStreamChunk {
+  event: TurnResponseEvent;
 }
 
 export interface Turn {
@@ -88,22 +91,44 @@ export namespace Turn {
 
   export namespace OutputAttachment {
     export interface ImageContentItem {
+      /**
+       * Image as a base64 encoded string or an URL
+       */
       image: ImageContentItem.Image;
 
+      /**
+       * Discriminator type of the content item. Always "image"
+       */
       type: 'image';
     }
 
     export namespace ImageContentItem {
+      /**
+       * Image as a base64 encoded string or an URL
+       */
       export interface Image {
+        /**
+         * base64 encoded image data as string
+         */
         data?: string;
 
+        /**
+         * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
+         * Note that URL could have length limits.
+         */
         url?: Shared.URL;
       }
     }
 
     export interface TextContentItem {
+      /**
+       * Text content
+       */
       text: string;
 
+      /**
+       * Discriminator type of the content item. Always "text"
+       */
       type: 'text';
     }
   }
@@ -168,14 +193,6 @@ export namespace TurnResponseEventPayload {
   }
 }
 
-export type TurnCreateResponse = Turn | TurnCreateResponse.AgentTurnResponseStreamChunk;
-
-export namespace TurnCreateResponse {
-  export interface AgentTurnResponseStreamChunk {
-    event: TurnAPI.TurnResponseEvent;
-  }
-}
-
 export type TurnCreateParams = TurnCreateParamsNonStreaming | TurnCreateParamsStreaming;
 
 export interface TurnCreateParamsBase {
@@ -202,22 +219,44 @@ export namespace TurnCreateParams {
 
   export namespace Document {
     export interface ImageContentItem {
+      /**
+       * Image as a base64 encoded string or an URL
+       */
       image: ImageContentItem.Image;
 
+      /**
+       * Discriminator type of the content item. Always "image"
+       */
       type: 'image';
     }
 
     export namespace ImageContentItem {
+      /**
+       * Image as a base64 encoded string or an URL
+       */
       export interface Image {
+        /**
+         * base64 encoded image data as string
+         */
         data?: string;
 
+        /**
+         * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
+         * Note that URL could have length limits.
+         */
         url?: Shared.URL;
       }
     }
 
     export interface TextContentItem {
+      /**
+       * Text content
+       */
       text: string;
 
+      /**
+       * Discriminator type of the content item. Always "text"
+       */
       type: 'text';
     }
   }
@@ -242,10 +281,10 @@ export interface TurnCreateParamsStreaming extends TurnCreateParamsBase {
 
 export declare namespace TurnResource {
   export {
+    type AgentTurnResponseStreamChunk as AgentTurnResponseStreamChunk,
     type Turn as Turn,
     type TurnResponseEvent as TurnResponseEvent,
     type TurnResponseEventPayload as TurnResponseEventPayload,
-    type TurnCreateResponse as TurnCreateResponse,
     type TurnCreateParams as TurnCreateParams,
     type TurnCreateParamsNonStreaming as TurnCreateParamsNonStreaming,
     type TurnCreateParamsStreaming as TurnCreateParamsStreaming,

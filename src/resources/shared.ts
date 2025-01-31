@@ -42,6 +42,18 @@ export interface BatchCompletion {
   batch: Array<InferenceAPI.CompletionResponse>;
 }
 
+export interface ChatCompletionResponse {
+  /**
+   * The complete response message
+   */
+  completion_message: CompletionMessage;
+
+  /**
+   * Optional log probabilities for generated tokens
+   */
+  logprobs?: Array<InferenceAPI.TokenLogProbs>;
+}
+
 export interface CompletionMessage {
   /**
    * The content of the model's response
@@ -110,22 +122,44 @@ export interface Document {
 
 export namespace Document {
   export interface ImageContentItem {
+    /**
+     * Image as a base64 encoded string or an URL
+     */
     image: ImageContentItem.Image;
 
+    /**
+     * Discriminator type of the content item. Always "image"
+     */
     type: 'image';
   }
 
   export namespace ImageContentItem {
+    /**
+     * Image as a base64 encoded string or an URL
+     */
     export interface Image {
+      /**
+       * base64 encoded image data as string
+       */
       data?: string;
 
+      /**
+       * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
+       * Note that URL could have length limits.
+       */
       url?: Shared.URL;
     }
   }
 
   export interface TextContentItem {
+    /**
+     * Text content
+     */
     text: string;
 
+    /**
+     * Discriminator type of the content item. Always "text"
+     */
     type: 'text';
   }
 }
@@ -138,22 +172,44 @@ export type InterleavedContent =
 
 export namespace InterleavedContent {
   export interface ImageContentItem {
+    /**
+     * Image as a base64 encoded string or an URL
+     */
     image: ImageContentItem.Image;
 
+    /**
+     * Discriminator type of the content item. Always "image"
+     */
     type: 'image';
   }
 
   export namespace ImageContentItem {
+    /**
+     * Image as a base64 encoded string or an URL
+     */
     export interface Image {
+      /**
+       * base64 encoded image data as string
+       */
       data?: string;
 
+      /**
+       * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
+       * Note that URL could have length limits.
+       */
       url?: Shared.URL;
     }
   }
 
   export interface TextContentItem {
+    /**
+     * Text content
+     */
     text: string;
 
+    /**
+     * Discriminator type of the content item. Always "text"
+     */
     type: 'text';
   }
 }
@@ -164,22 +220,44 @@ export type InterleavedContentItem =
 
 export namespace InterleavedContentItem {
   export interface ImageContentItem {
+    /**
+     * Image as a base64 encoded string or an URL
+     */
     image: ImageContentItem.Image;
 
+    /**
+     * Discriminator type of the content item. Always "image"
+     */
     type: 'image';
   }
 
   export namespace ImageContentItem {
+    /**
+     * Image as a base64 encoded string or an URL
+     */
     export interface Image {
+      /**
+       * base64 encoded image data as string
+       */
       data?: string;
 
+      /**
+       * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
+       * Note that URL could have length limits.
+       */
       url?: Shared.URL;
     }
   }
 
   export interface TextContentItem {
+    /**
+     * Text content
+     */
     text: string;
 
+    /**
+     * Discriminator type of the content item. Always "text"
+     */
     type: 'text';
   }
 }
