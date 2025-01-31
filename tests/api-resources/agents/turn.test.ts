@@ -6,8 +6,7 @@ import { Response } from 'node-fetch';
 const client = new LlamaStackClient({ baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010' });
 
 describe('resource turn', () => {
-  // skipped: currently no good way to test endpoints with content type text/event-stream, Prism mock server will fail
-  test.skip('create: only required params', async () => {
+  test('create: only required params', async () => {
     const responsePromise = client.agents.turn.create('agent_id', 'session_id', {
       messages: [{ content: 'string', role: 'user' }],
     });
@@ -20,8 +19,7 @@ describe('resource turn', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // skipped: currently no good way to test endpoints with content type text/event-stream, Prism mock server will fail
-  test.skip('create: required and optional params', async () => {
+  test('create: required and optional params', async () => {
     const response = await client.agents.turn.create('agent_id', 'session_id', {
       messages: [{ content: 'string', role: 'user', context: 'string' }],
       documents: [{ content: 'string', mime_type: 'mime_type' }],

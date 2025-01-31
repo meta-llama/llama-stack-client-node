@@ -15,11 +15,11 @@ import * as StepsAPI from './steps';
 import { StepRetrieveResponse, Steps } from './steps';
 import * as TurnAPI from './turn';
 import {
+  AgentTurnResponseStreamChunk,
   Turn,
   TurnCreateParams,
   TurnCreateParamsNonStreaming,
   TurnCreateParamsStreaming,
-  TurnCreateResponse,
   TurnResource,
   TurnResponseEvent,
   TurnResponseEventPayload,
@@ -145,10 +145,10 @@ export declare namespace Agents {
 
   export {
     TurnResource as TurnResource,
+    type AgentTurnResponseStreamChunk as AgentTurnResponseStreamChunk,
     type Turn as Turn,
     type TurnResponseEvent as TurnResponseEvent,
     type TurnResponseEventPayload as TurnResponseEventPayload,
-    type TurnCreateResponse as TurnCreateResponse,
     type TurnCreateParams as TurnCreateParams,
     type TurnCreateParamsNonStreaming as TurnCreateParamsNonStreaming,
     type TurnCreateParamsStreaming as TurnCreateParamsStreaming,

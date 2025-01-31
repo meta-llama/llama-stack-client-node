@@ -28,7 +28,7 @@ export class Tools extends APIResource {
 }
 
 export interface ListToolsResponse {
-  data: Array<Tool>;
+  data: ToolListResponse;
 }
 
 export interface Tool {

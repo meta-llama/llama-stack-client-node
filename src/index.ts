@@ -33,17 +33,16 @@ import {
   ListEvalTasksResponse,
 } from './resources/eval-tasks';
 import {
+  ChatCompletionResponseStreamChunk,
   CompletionResponse,
   EmbeddingsResponse,
   Inference,
   InferenceChatCompletionParams,
   InferenceChatCompletionParamsNonStreaming,
   InferenceChatCompletionParamsStreaming,
-  InferenceChatCompletionResponse,
   InferenceCompletionParams,
   InferenceCompletionParamsNonStreaming,
   InferenceCompletionParamsStreaming,
-  InferenceCompletionResponse,
   InferenceEmbeddingsParams,
   TokenLogProbs,
 } from './resources/inference';
@@ -407,11 +406,10 @@ export declare namespace LlamaStackClient {
 
   export {
     Inference as Inference,
+    type ChatCompletionResponseStreamChunk as ChatCompletionResponseStreamChunk,
     type CompletionResponse as CompletionResponse,
     type EmbeddingsResponse as EmbeddingsResponse,
     type TokenLogProbs as TokenLogProbs,
-    type InferenceChatCompletionResponse as InferenceChatCompletionResponse,
-    type InferenceCompletionResponse as InferenceCompletionResponse,
     type InferenceChatCompletionParams as InferenceChatCompletionParams,
     type InferenceChatCompletionParamsNonStreaming as InferenceChatCompletionParamsNonStreaming,
     type InferenceChatCompletionParamsStreaming as InferenceChatCompletionParamsStreaming,
@@ -538,6 +536,7 @@ export declare namespace LlamaStackClient {
 
   export type AgentConfig = API.AgentConfig;
   export type BatchCompletion = API.BatchCompletion;
+  export type ChatCompletionResponse = API.ChatCompletionResponse;
   export type CompletionMessage = API.CompletionMessage;
   export type ContentDelta = API.ContentDelta;
   export type Document = API.Document;
