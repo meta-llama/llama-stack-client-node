@@ -40,7 +40,7 @@ export interface EvalTask {
 }
 
 export interface ListEvalTasksResponse {
-  data: Array<EvalTask>;
+  data: EvalTaskListResponse;
 }
 
 export type EvalTaskListResponse = Array<EvalTask>;

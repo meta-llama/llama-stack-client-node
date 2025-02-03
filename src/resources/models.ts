@@ -27,7 +27,7 @@ export class Models extends APIResource {
 }
 
 export interface ListModelsResponse {
-  data: Array<Model>;
+  data: ModelListResponse;
 }
 
 export interface Model {

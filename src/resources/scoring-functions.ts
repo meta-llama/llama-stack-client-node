@@ -27,7 +27,7 @@ export class ScoringFunctions extends APIResource {
 }
 
 export interface ListScoringFunctionsResponse {
-  data: Array<ScoringFn>;
+  data: ScoringFunctionListResponse;
 }
 
 export interface ScoringFn {

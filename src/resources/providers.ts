@@ -13,7 +13,7 @@ export class Providers extends APIResource {
 }
 
 export interface ListProvidersResponse {
-  data: Array<InspectAPI.ProviderInfo>;
+  data: ProviderListResponse;
 }
 
 export type ProviderListResponse = Array<InspectAPI.ProviderInfo>;

@@ -20,7 +20,7 @@ export class Shields extends APIResource {
 }
 
 export interface ListShieldsResponse {
-  data: Array<Shield>;
+  data: ShieldListResponse;
 }
 
 export interface Shield {

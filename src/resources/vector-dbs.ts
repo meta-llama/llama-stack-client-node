@@ -33,23 +33,7 @@ export class VectorDBs extends APIResource {
 }
 
 export interface ListVectorDBsResponse {
-  data: Array<ListVectorDBsResponse.Data>;
-}
-
-export namespace ListVectorDBsResponse {
-  export interface Data {
-    embedding_dimension: number;
-
-    embedding_model: string;
-
-    identifier: string;
-
-    provider_id: string;
-
-    provider_resource_id: string;
-
-    type: 'vector_db';
-  }
+  data: VectorDBListResponse;
 }
 
 export interface VectorDBRetrieveResponse {
