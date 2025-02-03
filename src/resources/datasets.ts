@@ -35,25 +35,7 @@ export class Datasets extends APIResource {
 }
 
 export interface ListDatasetsResponse {
-  data: Array<ListDatasetsResponse.Data>;
-}
-
-export namespace ListDatasetsResponse {
-  export interface Data {
-    dataset_schema: Record<string, Shared.ParamType>;
-
-    identifier: string;
-
-    metadata: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
-
-    provider_id: string;
-
-    provider_resource_id: string;
-
-    type: 'dataset';
-
-    url: Shared.URL;
-  }
+  data: DatasetListResponse;
 }
 
 export interface DatasetRetrieveResponse {

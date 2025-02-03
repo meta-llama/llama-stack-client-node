@@ -41,7 +41,7 @@ export class Toolgroups extends APIResource {
 }
 
 export interface ListToolGroupsResponse {
-  data: Array<ToolGroup>;
+  data: ToolgroupListResponse;
 }
 
 export interface ToolGroup {

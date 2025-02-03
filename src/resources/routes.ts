@@ -13,7 +13,7 @@ export class Routes extends APIResource {
 }
 
 export interface ListRoutesResponse {
-  data: Array<InspectAPI.RouteInfo>;
+  data: RouteListResponse;
 }
 
 export type RouteListResponse = Array<InspectAPI.RouteInfo>;

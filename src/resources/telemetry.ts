@@ -165,25 +165,7 @@ export interface QueryCondition {
 }
 
 export interface QuerySpansResponse {
-  data: Array<QuerySpansResponse.Data>;
-}
-
-export namespace QuerySpansResponse {
-  export interface Data {
-    name: string;
-
-    span_id: string;
-
-    start_time: string;
-
-    trace_id: string;
-
-    attributes?: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
-
-    end_time?: string;
-
-    parent_span_id?: string;
-  }
+  data: TelemetryQuerySpansResponse;
 }
 
 export interface SpanWithStatus {
