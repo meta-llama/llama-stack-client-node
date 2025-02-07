@@ -26,6 +26,9 @@ export interface QueryChunksResponse {
 
 export namespace QueryChunksResponse {
   export interface Chunk {
+    /**
+     * A image content item
+     */
     content: Shared.InterleavedContent;
 
     metadata: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
@@ -42,6 +45,9 @@ export interface VectorIoInsertParams {
 
 export namespace VectorIoInsertParams {
   export interface Chunk {
+    /**
+     * A image content item
+     */
     content: Shared.InterleavedContent;
 
     metadata: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
@@ -49,6 +55,9 @@ export namespace VectorIoInsertParams {
 }
 
 export interface VectorIoQueryParams {
+  /**
+   * A image content item
+   */
   query: Shared.InterleavedContent;
 
   vector_db_id: string;

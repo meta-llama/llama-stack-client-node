@@ -23,6 +23,9 @@ export interface ListShieldsResponse {
   data: ShieldListResponse;
 }
 
+/**
+ * A safety shield resource that can be used to check content
+ */
 export interface Shield {
   identifier: string;
 

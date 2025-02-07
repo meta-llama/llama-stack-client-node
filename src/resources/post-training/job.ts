@@ -3,12 +3,15 @@
 import { APIResource } from '../../resource';
 import * as Core from '../../core';
 import { ListPostTrainingJobsResponse } from './post-training';
+import * as PostTrainingAPI from './post-training';
 
 export class Job extends APIResource {
-  list(options?: Core.RequestOptions): Core.APIPromise<Array<ListPostTrainingJobsResponse.Data>> {
+  list(
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<Array<PostTrainingAPI.ListPostTrainingJobsResponse.Data>> {
     return (
       this._client.get('/v1/post-training/jobs', options) as Core.APIPromise<{
-        data: Array<ListPostTrainingJobsResponse.Data>;
+        data: Array<PostTrainingAPI.ListPostTrainingJobsResponse.Data>;
       }>
     )._thenUnwrap((obj) => obj.data);
   }
@@ -41,12 +44,18 @@ export namespace JobListResponse {
   }
 }
 
+/**
+ * Artifacts of a finetuning job.
+ */
 export interface JobArtifactsResponse {
   checkpoints: Array<unknown>;
 
   job_uuid: string;
 }
 
+/**
+ * Status of a finetuning job.
+ */
 export interface JobStatusResponse {
   checkpoints: Array<unknown>;
 

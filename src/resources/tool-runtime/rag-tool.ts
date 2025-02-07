@@ -33,6 +33,9 @@ export interface RagToolInsertParams {
 }
 
 export interface RagToolQueryParams {
+  /**
+   * A image content item
+   */
   content: Shared.InterleavedContent;
 
   vector_db_ids: Array<string>;

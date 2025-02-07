@@ -13,6 +13,10 @@ export class SyntheticDataGeneration extends APIResource {
   }
 }
 
+/**
+ * Response from the synthetic data generation. Batch of (prompt, response, score)
+ * tuples that pass the threshold.
+ */
 export interface SyntheticDataGenerationResponse {
   synthetic_data: Array<Record<string, boolean | number | string | Array<unknown> | unknown | null>>;
 
@@ -22,6 +26,9 @@ export interface SyntheticDataGenerationResponse {
 export interface SyntheticDataGenerationGenerateParams {
   dialogs: Array<Shared.Message>;
 
+  /**
+   * The type of filtering function.
+   */
   filtering_function: 'none' | 'random' | 'top_k' | 'top_p' | 'top_k_top_p' | 'sigmoid';
 
   model?: string;

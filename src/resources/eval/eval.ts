@@ -34,6 +34,9 @@ export namespace EvalCandidate {
 
     type: 'model';
 
+    /**
+     * A system message providing instructions or context to the model.
+     */
     system_message?: Shared.SystemMessage;
   }
 
