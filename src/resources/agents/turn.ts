@@ -50,15 +50,24 @@ export class TurnResource extends APIResource {
   }
 }
 
+/**
+ * streamed agent turn completion response.
+ */
 export interface AgentTurnResponseStreamChunk {
   event: TurnResponseEvent;
 }
 
+/**
+ * A single turn in an interaction with an Agentic System.
+ */
 export interface Turn {
   input_messages: Array<Shared.UserMessage | Shared.ToolResponseMessage>;
 
   output_attachments: Array<Turn.OutputAttachment>;
 
+  /**
+   * A message containing the model's (assistant) response in a chat conversation.
+   */
   output_message: Shared.CompletionMessage;
 
   session_id: string;
@@ -79,6 +88,9 @@ export interface Turn {
 
 export namespace Turn {
   export interface OutputAttachment {
+    /**
+     * A image content item
+     */
     content:
       | string
       | OutputAttachment.ImageContentItem
@@ -90,6 +102,9 @@ export namespace Turn {
   }
 
   export namespace OutputAttachment {
+    /**
+     * A image content item
+     */
     export interface ImageContentItem {
       /**
        * Image as a base64 encoded string or an URL
@@ -120,6 +135,9 @@ export namespace Turn {
       }
     }
 
+    /**
+     * A text content item
+     */
     export interface TextContentItem {
       /**
        * Text content
@@ -189,6 +207,9 @@ export namespace TurnResponseEventPayload {
   export interface AgentTurnResponseTurnCompletePayload {
     event_type: 'turn_complete';
 
+    /**
+     * A single turn in an interaction with an Agentic System.
+     */
     turn: TurnAPI.Turn;
   }
 }
@@ -207,6 +228,9 @@ export interface TurnCreateParamsBase {
 
 export namespace TurnCreateParams {
   export interface Document {
+    /**
+     * A image content item
+     */
     content:
       | string
       | Document.ImageContentItem
@@ -218,6 +242,9 @@ export namespace TurnCreateParams {
   }
 
   export namespace Document {
+    /**
+     * A image content item
+     */
     export interface ImageContentItem {
       /**
        * Image as a base64 encoded string or an URL
@@ -248,6 +275,9 @@ export namespace TurnCreateParams {
       }
     }
 
+    /**
+     * A text content item
+     */
     export interface TextContentItem {
       /**
        * Text content

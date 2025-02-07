@@ -43,6 +43,9 @@ export class Agents extends APIResource {
 }
 
 export interface InferenceStep {
+  /**
+   * A message containing the model's (assistant) response in a chat conversation.
+   */
   model_response: Shared.CompletionMessage;
 
   step_id: string;
@@ -57,6 +60,9 @@ export interface InferenceStep {
 }
 
 export interface MemoryRetrievalStep {
+  /**
+   * A image content item
+   */
   inserted_context: Shared.InterleavedContent;
 
   step_id: string;
@@ -105,6 +111,9 @@ export interface ToolExecutionStep {
 export interface ToolResponse {
   call_id: string;
 
+  /**
+   * A image content item
+   */
   content: Shared.InterleavedContent;
 
   tool_name: 'brave_search' | 'wolfram_alpha' | 'photogen' | 'code_interpreter' | (string & {});

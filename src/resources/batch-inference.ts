@@ -31,12 +31,23 @@ export interface BatchInferenceChatCompletionParams {
 
   logprobs?: BatchInferenceChatCompletionParams.Logprobs;
 
+  /**
+   * Configuration for JSON schema-guided response generation.
+   */
   response_format?: Shared.ResponseFormat;
 
   sampling_params?: Shared.SamplingParams;
 
+  /**
+   * Whether tool use is required or automatic. This is a hint to the model which may
+   * not be followed. It depends on the Instruction Following capabilities of the
+   * model.
+   */
   tool_choice?: 'auto' | 'required';
 
+  /**
+   * Prompt format for calling custom / zero shot tools.
+   */
   tool_prompt_format?: 'json' | 'function_tag' | 'python_list';
 
   tools?: Array<BatchInferenceChatCompletionParams.Tool>;
@@ -66,6 +77,9 @@ export interface BatchInferenceCompletionParams {
 
   logprobs?: BatchInferenceCompletionParams.Logprobs;
 
+  /**
+   * Configuration for JSON schema-guided response generation.
+   */
   response_format?: Shared.ResponseFormat;
 
   sampling_params?: Shared.SamplingParams;

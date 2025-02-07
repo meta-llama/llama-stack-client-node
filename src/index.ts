@@ -160,6 +160,11 @@ import {
 
 export interface ClientOptions {
   /**
+   * Defaults to process.env['LLAMA_STACK_CLIENT_API_KEY'].
+   */
+  apiKey?: string | null | undefined;
+
+  /**
    * Override the default base URL for the API, e.g., "https://api.example.com/v2/"
    *
    * Defaults to process.env['LLAMA_STACK_CLIENT_BASE_URL'].
@@ -220,11 +225,14 @@ export interface ClientOptions {
  * API Client for interfacing with the Llama Stack Client API.
  */
 export class LlamaStackClient extends Core.APIClient {
+  apiKey: string | null;
+
   private _options: ClientOptions;
 
   /**
    * API Client for interfacing with the Llama Stack Client API.
    *
+   * @param {string | null | undefined} [opts.apiKey=process.env['LLAMA_STACK_CLIENT_API_KEY'] ?? null]
    * @param {string} [opts.baseURL=process.env['LLAMA_STACK_CLIENT_BASE_URL'] ?? http://any-hosted-llama-stack.com] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {number} [opts.httpAgent] - An HTTP agent used to manage HTTP(s) connections.
@@ -233,8 +241,13 @@ export class LlamaStackClient extends Core.APIClient {
    * @param {Core.Headers} opts.defaultHeaders - Default headers to include with every request to the API.
    * @param {Core.DefaultQuery} opts.defaultQuery - Default query parameters to include with every request to the API.
    */
-  constructor({ baseURL = Core.readEnv('LLAMA_STACK_CLIENT_BASE_URL'), ...opts }: ClientOptions = {}) {
+  constructor({
+    baseURL = Core.readEnv('LLAMA_STACK_CLIENT_BASE_URL'),
+    apiKey = Core.readEnv('LLAMA_STACK_CLIENT_API_KEY') ?? null,
+    ...opts
+  }: ClientOptions = {}) {
     const options: ClientOptions = {
+      apiKey,
       ...opts,
       baseURL: baseURL || `http://any-hosted-llama-stack.com`,
     };
@@ -248,6 +261,8 @@ export class LlamaStackClient extends Core.APIClient {
     });
 
     this._options = options;
+
+    this.apiKey = apiKey;
   }
 
   toolgroups: API.Toolgroups = new API.Toolgroups(this);
@@ -283,6 +298,13 @@ export class LlamaStackClient extends Core.APIClient {
       ...super.defaultHeaders(opts),
       ...this._options.defaultHeaders,
     };
+  }
+
+  protected override authHeaders(opts: Core.FinalRequestOptions): Core.Headers {
+    if (this.apiKey == null) {
+      return {};
+    }
+    return { Authorization: `Bearer ${this.apiKey}` };
   }
 
   protected override stringifyQuery(query: Record<string, unknown>): string {

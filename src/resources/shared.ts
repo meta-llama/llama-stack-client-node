@@ -19,12 +19,23 @@ export interface AgentConfig {
 
   output_shields?: Array<string>;
 
+  /**
+   * Configuration for JSON schema-guided response generation.
+   */
   response_format?: ResponseFormat;
 
   sampling_params?: SamplingParams;
 
+  /**
+   * Whether tool use is required or automatic. This is a hint to the model which may
+   * not be followed. It depends on the Instruction Following capabilities of the
+   * model.
+   */
   tool_choice?: 'auto' | 'required';
 
+  /**
+   * Prompt format for calling custom / zero shot tools.
+   */
   tool_prompt_format?: 'json' | 'function_tag' | 'python_list';
 
   toolgroups?: Array<string | AgentConfig.UnionMember1>;
@@ -42,6 +53,9 @@ export interface BatchCompletion {
   batch: Array<InferenceAPI.CompletionResponse>;
 }
 
+/**
+ * Response from a chat completion request.
+ */
 export interface ChatCompletionResponse {
   /**
    * The complete response message
@@ -54,6 +68,9 @@ export interface ChatCompletionResponse {
   logprobs?: Array<InferenceAPI.TokenLogProbs>;
 }
 
+/**
+ * A message containing the model's (assistant) response in a chat conversation.
+ */
 export interface CompletionMessage {
   /**
    * The content of the model's response
@@ -106,6 +123,9 @@ export namespace ContentDelta {
 }
 
 export interface Document {
+  /**
+   * A image content item
+   */
   content:
     | string
     | Document.ImageContentItem
@@ -121,6 +141,9 @@ export interface Document {
 }
 
 export namespace Document {
+  /**
+   * A image content item
+   */
   export interface ImageContentItem {
     /**
      * Image as a base64 encoded string or an URL
@@ -151,6 +174,9 @@ export namespace Document {
     }
   }
 
+  /**
+   * A text content item
+   */
   export interface TextContentItem {
     /**
      * Text content
@@ -164,6 +190,9 @@ export namespace Document {
   }
 }
 
+/**
+ * A image content item
+ */
 export type InterleavedContent =
   | string
   | InterleavedContent.ImageContentItem
@@ -171,6 +200,9 @@ export type InterleavedContent =
   | Array<InterleavedContentItem>;
 
 export namespace InterleavedContent {
+  /**
+   * A image content item
+   */
   export interface ImageContentItem {
     /**
      * Image as a base64 encoded string or an URL
@@ -201,6 +233,9 @@ export namespace InterleavedContent {
     }
   }
 
+  /**
+   * A text content item
+   */
   export interface TextContentItem {
     /**
      * Text content
@@ -214,11 +249,17 @@ export namespace InterleavedContent {
   }
 }
 
+/**
+ * A image content item
+ */
 export type InterleavedContentItem =
   | InterleavedContentItem.ImageContentItem
   | InterleavedContentItem.TextContentItem;
 
 export namespace InterleavedContentItem {
+  /**
+   * A image content item
+   */
   export interface ImageContentItem {
     /**
      * Image as a base64 encoded string or an URL
@@ -249,6 +290,9 @@ export namespace InterleavedContentItem {
     }
   }
 
+  /**
+   * A text content item
+   */
   export interface TextContentItem {
     /**
      * Text content
@@ -262,6 +306,9 @@ export namespace InterleavedContentItem {
   }
 }
 
+/**
+ * A message from the user in a chat conversation.
+ */
 export type Message = UserMessage | SystemMessage | ToolResponseMessage | CompletionMessage;
 
 export type ParamType =
@@ -347,12 +394,21 @@ export namespace QueryGeneratorConfig {
 }
 
 export interface QueryResult {
+  /**
+   * A image content item
+   */
   content?: InterleavedContent;
 }
 
+/**
+ * Configuration for JSON schema-guided response generation.
+ */
 export type ResponseFormat = ResponseFormat.JsonSchemaResponseFormat | ResponseFormat.GrammarResponseFormat;
 
 export namespace ResponseFormat {
+  /**
+   * Configuration for JSON schema-guided response generation.
+   */
   export interface JsonSchemaResponseFormat {
     /**
      * The JSON schema the response should conform to. In a Python SDK, this is often a
@@ -366,6 +422,9 @@ export namespace ResponseFormat {
     type: 'json_schema';
   }
 
+  /**
+   * Configuration for grammar-guided response generation.
+   */
   export interface GrammarResponseFormat {
     /**
      * The BNF grammar specification the response should conform to
@@ -438,6 +497,9 @@ export interface ScoringResult {
   score_rows: Array<Record<string, boolean | number | string | Array<unknown> | unknown | null>>;
 }
 
+/**
+ * A system message providing instructions or context to the model.
+ */
 export interface SystemMessage {
   /**
    * The content of the "system prompt". If multiple system messages are provided,
@@ -478,6 +540,9 @@ export interface ToolParamDefinition {
   required?: boolean;
 }
 
+/**
+ * A message representing the result of a tool invocation.
+ */
 export interface ToolResponseMessage {
   /**
    * Unique identifier for the tool call this response is for
@@ -504,6 +569,9 @@ export interface URL {
   uri: string;
 }
 
+/**
+ * A message from the user in a chat conversation.
+ */
 export interface UserMessage {
   /**
    * The content of the message, which can include text and other media

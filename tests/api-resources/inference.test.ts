@@ -29,6 +29,7 @@ describe('resource inference', () => {
       sampling_params: { strategy: { type: 'greedy' }, max_tokens: 0, repetition_penalty: 0 },
       stream: false,
       tool_choice: 'auto',
+      tool_config: { system_message_behavior: 'append', tool_choice: 'auto', tool_prompt_format: 'json' },
       tool_prompt_format: 'json',
       tools: [
         {

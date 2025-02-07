@@ -41,6 +41,9 @@ export class SessionResource extends APIResource {
   }
 }
 
+/**
+ * A single session of an interaction with an Agentic System.
+ */
 export interface Session {
   session_id: string;
 

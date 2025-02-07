@@ -71,6 +71,9 @@ export class Inference extends APIResource {
   }
 }
 
+/**
+ * A chunk of a streamed chat completion response.
+ */
 export interface ChatCompletionResponseStreamChunk {
   /**
    * The event containing the new content
@@ -106,6 +109,9 @@ export namespace ChatCompletionResponseStreamChunk {
   }
 }
 
+/**
+ * Response from a completion request.
+ */
 export interface CompletionResponse {
   /**
    * The generated completion text
@@ -123,6 +129,9 @@ export interface CompletionResponse {
   logprobs?: Array<TokenLogProbs>;
 }
 
+/**
+ * Response containing generated embeddings.
+ */
 export interface EmbeddingsResponse {
   /**
    * List of embedding vectors, one per input content. Each embedding is a list of
@@ -132,6 +141,9 @@ export interface EmbeddingsResponse {
   embeddings: Array<Array<number>>;
 }
 
+/**
+ * Log probabilities for generated tokens.
+ */
 export interface TokenLogProbs {
   /**
    * Dictionary mapping tokens to their log probabilities
@@ -182,9 +194,14 @@ export interface InferenceChatCompletionParamsBase {
 
   /**
    * (Optional) Whether tool use is required or automatic. Defaults to
-   * ToolChoice.auto.
+   * ToolChoice.auto. .. deprecated:: Use tool_config instead.
    */
   tool_choice?: 'auto' | 'required';
+
+  /**
+   * (Optional) Configuration for tool use.
+   */
+  tool_config?: InferenceChatCompletionParams.ToolConfig;
 
   /**
    * (Optional) Instructs the model how to format tool calls. By default, Llama Stack
@@ -192,7 +209,8 @@ export interface InferenceChatCompletionParamsBase {
    * `ToolPromptFormat.json`: The tool calls are formatted as a JSON object. -
    * `ToolPromptFormat.function_tag`: The tool calls are enclosed in a
    * <function=function_name> tag. - `ToolPromptFormat.python_list`: The tool calls
-   * are output as Python syntax -- a list of function calls.
+   * are output as Python syntax -- a list of function calls. .. deprecated:: Use
+   * tool_config instead.
    */
   tool_prompt_format?: 'json' | 'function_tag' | 'python_list';
 
@@ -212,6 +230,37 @@ export namespace InferenceChatCompletionParams {
      * How many tokens (for each position) to return log probabilities for.
      */
     top_k?: number;
+  }
+
+  /**
+   * (Optional) Configuration for tool use.
+   */
+  export interface ToolConfig {
+    /**
+     * (Optional) Config for how to override the default system prompt. -
+     * `SystemMessageBehavior.append`: Appends the provided system message to the
+     * default system prompt. - `SystemMessageBehavior.replace`: Replaces the default
+     * system prompt with the provided system message. The system message can include
+     * the string '{{function_definitions}}' to indicate where the function definitions
+     * should be inserted.
+     */
+    system_message_behavior: 'append' | 'replace';
+
+    /**
+     * (Optional) Whether tool use is required or automatic. Defaults to
+     * ToolChoice.auto.
+     */
+    tool_choice?: 'auto' | 'required';
+
+    /**
+     * (Optional) Instructs the model how to format tool calls. By default, Llama Stack
+     * will attempt to use a format that is best adapted to the model. -
+     * `ToolPromptFormat.json`: The tool calls are formatted as a JSON object. -
+     * `ToolPromptFormat.function_tag`: The tool calls are enclosed in a
+     * <function=function_name> tag. - `ToolPromptFormat.python_list`: The tool calls
+     * are output as Python syntax -- a list of function calls.
+     */
+    tool_prompt_format?: 'json' | 'function_tag' | 'python_list';
   }
 
   export interface Tool {
