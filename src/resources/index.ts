@@ -39,8 +39,8 @@ export {
 } from './datasets';
 export {
   Eval,
+  type BenchmarkConfig,
   type EvalCandidate,
-  type EvalTaskConfig,
   type EvaluateResponse,
   type Job,
   type EvalEvaluateRowsParams,

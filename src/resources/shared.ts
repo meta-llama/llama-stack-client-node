@@ -5,13 +5,13 @@ import * as InferenceAPI from './inference';
 import * as ToolRuntimeAPI from './tool-runtime/tool-runtime';
 
 export interface AgentConfig {
-  enable_session_persistence: boolean;
-
   instructions: string;
 
   model: string;
 
   client_tools?: Array<ToolRuntimeAPI.ToolDef>;
+
+  enable_session_persistence?: boolean;
 
   input_shields?: Array<string>;
 
