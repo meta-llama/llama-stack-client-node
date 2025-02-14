@@ -104,7 +104,7 @@ export namespace Event {
 
     type: 'unstructured_log';
 
-    attributes?: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
+    attributes?: Record<string, string | number | boolean | null>;
   }
 
   export interface MetricEvent {
@@ -122,7 +122,7 @@ export namespace Event {
 
     value: number;
 
-    attributes?: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
+    attributes?: Record<string, string | number | boolean | null>;
   }
 
   export interface StructuredLogEvent {
@@ -136,7 +136,7 @@ export namespace Event {
 
     type: 'structured_log';
 
-    attributes?: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
+    attributes?: Record<string, string | number | boolean | null>;
   }
 
   export namespace StructuredLogEvent {

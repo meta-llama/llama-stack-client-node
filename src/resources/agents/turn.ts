@@ -63,8 +63,6 @@ export interface AgentTurnResponseStreamChunk {
 export interface Turn {
   input_messages: Array<Shared.UserMessage | Shared.ToolResponseMessage>;
 
-  output_attachments: Array<Turn.OutputAttachment>;
-
   /**
    * A message containing the model's (assistant) response in a chat conversation.
    */
@@ -84,6 +82,8 @@ export interface Turn {
   turn_id: string;
 
   completed_at?: string;
+
+  output_attachments?: Array<Turn.OutputAttachment>;
 }
 
 export namespace Turn {
@@ -96,7 +96,7 @@ export namespace Turn {
       | OutputAttachment.ImageContentItem
       | OutputAttachment.TextContentItem
       | Array<Shared.InterleavedContentItem>
-      | Shared.URL;
+      | OutputAttachment.URL;
 
     mime_type: string;
   }
@@ -131,7 +131,17 @@ export namespace Turn {
          * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
          * Note that URL could have length limits.
          */
-        url?: Shared.URL;
+        url?: Image.URL;
+      }
+
+      export namespace Image {
+        /**
+         * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
+         * Note that URL could have length limits.
+         */
+        export interface URL {
+          uri: string;
+        }
       }
     }
 
@@ -148,6 +158,10 @@ export namespace Turn {
        * Discriminator type of the content item. Always "text"
        */
       type: 'text';
+    }
+
+    export interface URL {
+      uri: string;
     }
   }
 }
@@ -223,6 +237,11 @@ export interface TurnCreateParamsBase {
 
   stream?: boolean;
 
+  /**
+   * Configuration for tool use.
+   */
+  tool_config?: TurnCreateParams.ToolConfig;
+
   toolgroups?: Array<string | TurnCreateParams.UnionMember1>;
 }
 
@@ -236,7 +255,7 @@ export namespace TurnCreateParams {
       | Document.ImageContentItem
       | Document.TextContentItem
       | Array<Shared.InterleavedContentItem>
-      | Shared.URL;
+      | Document.URL;
 
     mime_type: string;
   }
@@ -271,7 +290,17 @@ export namespace TurnCreateParams {
          * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
          * Note that URL could have length limits.
          */
-        url?: Shared.URL;
+        url?: Image.URL;
+      }
+
+      export namespace Image {
+        /**
+         * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
+         * Note that URL could have length limits.
+         */
+        export interface URL {
+          uri: string;
+        }
       }
     }
 
@@ -289,6 +318,41 @@ export namespace TurnCreateParams {
        */
       type: 'text';
     }
+
+    export interface URL {
+      uri: string;
+    }
+  }
+
+  /**
+   * Configuration for tool use.
+   */
+  export interface ToolConfig {
+    /**
+     * (Optional) Config for how to override the default system prompt. -
+     * `SystemMessageBehavior.append`: Appends the provided system message to the
+     * default system prompt. - `SystemMessageBehavior.replace`: Replaces the default
+     * system prompt with the provided system message. The system message can include
+     * the string '{{function_definitions}}' to indicate where the function definitions
+     * should be inserted.
+     */
+    system_message_behavior: 'append' | 'replace';
+
+    /**
+     * (Optional) Whether tool use is required or automatic. Defaults to
+     * ToolChoice.auto.
+     */
+    tool_choice?: 'auto' | 'required';
+
+    /**
+     * (Optional) Instructs the model how to format tool calls. By default, Llama Stack
+     * will attempt to use a format that is best adapted to the model. -
+     * `ToolPromptFormat.json`: The tool calls are formatted as a JSON object. -
+     * `ToolPromptFormat.function_tag`: The tool calls are enclosed in a
+     * <function=function_name> tag. - `ToolPromptFormat.python_list`: The tool calls
+     * are output as Python syntax -- a list of function calls.
+     */
+    tool_prompt_format?: 'json' | 'function_tag' | 'python_list';
   }
 
   export interface UnionMember1 {

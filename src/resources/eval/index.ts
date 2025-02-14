@@ -7,6 +7,8 @@ export {
   type EvaluateResponse,
   type Job,
   type EvalEvaluateRowsParams,
+  type EvalEvaluateRowsAlphaParams,
   type EvalRunEvalParams,
+  type EvalRunEvalAlphaParams,
 } from './eval';
 export { Jobs, type JobStatusResponse } from './jobs';

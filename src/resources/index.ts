@@ -18,6 +18,13 @@ export {
   type BatchInferenceCompletionParams,
 } from './batch-inference';
 export {
+  Benchmarks,
+  type Benchmark,
+  type ListBenchmarksResponse,
+  type BenchmarkListResponse,
+  type BenchmarkRegisterParams,
+} from './benchmarks';
+export {
   Datasetio,
   type PaginatedRowsResult,
   type DatasetioAppendRowsParams,
@@ -37,15 +44,11 @@ export {
   type EvaluateResponse,
   type Job,
   type EvalEvaluateRowsParams,
+  type EvalEvaluateRowsAlphaParams,
   type EvalRunEvalParams,
+  type EvalRunEvalAlphaParams,
 } from './eval/eval';
-export {
-  EvalTasks,
-  type EvalTask,
-  type ListEvalTasksResponse,
-  type EvalTaskListResponse,
-  type EvalTaskRegisterParams,
-} from './eval-tasks';
+export { EvalTasks, type EvalTaskListResponse, type EvalTaskRegisterParams } from './eval-tasks';
 export {
   Inference,
   type ChatCompletionResponseStreamChunk,

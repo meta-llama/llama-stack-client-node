@@ -13,6 +13,13 @@ import {
   BatchInferenceCompletionParams,
 } from './resources/batch-inference';
 import {
+  Benchmark,
+  BenchmarkListResponse,
+  BenchmarkRegisterParams,
+  Benchmarks,
+  ListBenchmarksResponse,
+} from './resources/benchmarks';
+import {
   Datasetio,
   DatasetioAppendRowsParams,
   DatasetioGetRowsPaginatedParams,
@@ -25,13 +32,7 @@ import {
   Datasets,
   ListDatasetsResponse,
 } from './resources/datasets';
-import {
-  EvalTask,
-  EvalTaskListResponse,
-  EvalTaskRegisterParams,
-  EvalTasks,
-  ListEvalTasksResponse,
-} from './resources/eval-tasks';
+import { EvalTaskListResponse, EvalTaskRegisterParams, EvalTasks } from './resources/eval-tasks';
 import {
   ChatCompletionResponseStreamChunk,
   CompletionResponse,
@@ -136,7 +137,9 @@ import {
 import {
   Eval,
   EvalCandidate,
+  EvalEvaluateRowsAlphaParams,
   EvalEvaluateRowsParams,
+  EvalRunEvalAlphaParams,
   EvalRunEvalParams,
   EvalTaskConfig,
   EvaluateResponse,
@@ -288,6 +291,7 @@ export class LlamaStackClient extends Core.APIClient {
   scoring: API.Scoring = new API.Scoring(this);
   scoringFunctions: API.ScoringFunctions = new API.ScoringFunctions(this);
   evalTasks: API.EvalTasks = new API.EvalTasks(this);
+  benchmarks: API.Benchmarks = new API.Benchmarks(this);
 
   protected override defaultQuery(): Core.DefaultQuery | undefined {
     return this._options.defaultQuery;
@@ -355,6 +359,7 @@ LlamaStackClient.Datasetio = Datasetio;
 LlamaStackClient.Scoring = Scoring;
 LlamaStackClient.ScoringFunctions = ScoringFunctions;
 LlamaStackClient.EvalTasks = EvalTasks;
+LlamaStackClient.Benchmarks = Benchmarks;
 export declare namespace LlamaStackClient {
   export type RequestOptions = Core.RequestOptions;
 
@@ -415,7 +420,9 @@ export declare namespace LlamaStackClient {
     type EvaluateResponse as EvaluateResponse,
     type Job as Job,
     type EvalEvaluateRowsParams as EvalEvaluateRowsParams,
+    type EvalEvaluateRowsAlphaParams as EvalEvaluateRowsAlphaParams,
     type EvalRunEvalParams as EvalRunEvalParams,
+    type EvalRunEvalAlphaParams as EvalRunEvalAlphaParams,
   };
 
   export {
@@ -550,10 +557,16 @@ export declare namespace LlamaStackClient {
 
   export {
     EvalTasks as EvalTasks,
-    type EvalTask as EvalTask,
-    type ListEvalTasksResponse as ListEvalTasksResponse,
     type EvalTaskListResponse as EvalTaskListResponse,
     type EvalTaskRegisterParams as EvalTaskRegisterParams,
+  };
+
+  export {
+    Benchmarks as Benchmarks,
+    type Benchmark as Benchmark,
+    type ListBenchmarksResponse as ListBenchmarksResponse,
+    type BenchmarkListResponse as BenchmarkListResponse,
+    type BenchmarkRegisterParams as BenchmarkRegisterParams,
   };
 
   export type AgentConfig = API.AgentConfig;
@@ -576,9 +589,9 @@ export declare namespace LlamaStackClient {
   export type ScoringResult = API.ScoringResult;
   export type SystemMessage = API.SystemMessage;
   export type ToolCall = API.ToolCall;
+  export type ToolCallOrString = API.ToolCallOrString;
   export type ToolParamDefinition = API.ToolParamDefinition;
   export type ToolResponseMessage = API.ToolResponseMessage;
-  export type URL = API.URL;
   export type UserMessage = API.UserMessage;
 }
 

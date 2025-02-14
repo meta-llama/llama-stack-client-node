@@ -5,9 +5,9 @@ import { Response } from 'node-fetch';
 
 const client = new LlamaStackClient({ baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010' });
 
-describe('resource jobs', () => {
+describe('resource benchmarks', () => {
   test('retrieve', async () => {
-    const responsePromise = client.eval.jobs.retrieve('benchmark_id', 'job_id');
+    const responsePromise = client.benchmarks.retrieve('benchmark_id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -20,12 +20,12 @@ describe('resource jobs', () => {
   test('retrieve: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.eval.jobs.retrieve('benchmark_id', 'job_id', { path: '/_stainless_unknown_path' }),
+      client.benchmarks.retrieve('benchmark_id', { path: '/_stainless_unknown_path' }),
     ).rejects.toThrow(LlamaStackClient.NotFoundError);
   });
 
-  test('cancel', async () => {
-    const responsePromise = client.eval.jobs.cancel('benchmark_id', 'job_id');
+  test('list', async () => {
+    const responsePromise = client.benchmarks.list();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -35,15 +35,19 @@ describe('resource jobs', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('cancel: request options instead of params are passed correctly', async () => {
+  test('list: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.eval.jobs.cancel('benchmark_id', 'job_id', { path: '/_stainless_unknown_path' }),
-    ).rejects.toThrow(LlamaStackClient.NotFoundError);
+    await expect(client.benchmarks.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+      LlamaStackClient.NotFoundError,
+    );
   });
 
-  test('status', async () => {
-    const responsePromise = client.eval.jobs.status('benchmark_id', 'job_id');
+  test('register: only required params', async () => {
+    const responsePromise = client.benchmarks.register({
+      benchmark_id: 'benchmark_id',
+      dataset_id: 'dataset_id',
+      scoring_functions: ['string'],
+    });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -53,10 +57,14 @@ describe('resource jobs', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('status: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.eval.jobs.status('benchmark_id', 'job_id', { path: '/_stainless_unknown_path' }),
-    ).rejects.toThrow(LlamaStackClient.NotFoundError);
+  test('register: required and optional params', async () => {
+    const response = await client.benchmarks.register({
+      benchmark_id: 'benchmark_id',
+      dataset_id: 'dataset_id',
+      scoring_functions: ['string'],
+      metadata: { foo: true },
+      provider_benchmark_id: 'provider_benchmark_id',
+      provider_id: 'provider_id',
+    });
   });
 });
