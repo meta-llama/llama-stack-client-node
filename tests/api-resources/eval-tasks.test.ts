@@ -63,7 +63,7 @@ describe('resource evalTasks', () => {
       eval_task_id: 'eval_task_id',
       scoring_functions: ['string'],
       metadata: { foo: true },
-      provider_eval_task_id: 'provider_eval_task_id',
+      provider_benchmark_id: 'provider_benchmark_id',
       provider_id: 'provider_id',
     });
   });

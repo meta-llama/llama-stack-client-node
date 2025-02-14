@@ -8,12 +8,7 @@ const client = new LlamaStackClient({ baseURL: process.env['TEST_API_BASE_URL'] 
 describe('resource agents', () => {
   test('create: only required params', async () => {
     const responsePromise = client.agents.create({
-      agent_config: {
-        enable_session_persistence: true,
-        instructions: 'instructions',
-        max_infer_iters: 0,
-        model: 'model',
-      },
+      agent_config: { enable_session_persistence: true, instructions: 'instructions', model: 'model' },
     });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -29,7 +24,6 @@ describe('resource agents', () => {
       agent_config: {
         enable_session_persistence: true,
         instructions: 'instructions',
-        max_infer_iters: 0,
         model: 'model',
         client_tools: [
           {
@@ -48,10 +42,12 @@ describe('resource agents', () => {
           },
         ],
         input_shields: ['string'],
+        max_infer_iters: 0,
         output_shields: ['string'],
         response_format: { json_schema: { foo: true }, type: 'json_schema' },
         sampling_params: { strategy: { type: 'greedy' }, max_tokens: 0, repetition_penalty: 0 },
         tool_choice: 'auto',
+        tool_config: { system_message_behavior: 'append', tool_choice: 'auto', tool_prompt_format: 'json' },
         tool_prompt_format: 'json',
         toolgroups: ['string'],
       },

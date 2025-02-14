@@ -12,6 +12,7 @@ describe('resource eval', () => {
       scoring_functions: ['string'],
       task_config: {
         eval_candidate: { model: 'model', sampling_params: { strategy: { type: 'greedy' } }, type: 'model' },
+        scoring_params: { foo: { judge_model: 'judge_model', type: 'llm_as_judge' } },
         type: 'benchmark',
       },
     });
@@ -35,6 +36,60 @@ describe('resource eval', () => {
           type: 'model',
           system_message: { content: 'string', role: 'system' },
         },
+        scoring_params: {
+          foo: {
+            judge_model: 'judge_model',
+            type: 'llm_as_judge',
+            aggregation_functions: ['average'],
+            judge_score_regexes: ['string'],
+            prompt_template: 'prompt_template',
+          },
+        },
+        type: 'benchmark',
+        num_examples: 0,
+      },
+    });
+  });
+
+  test('evaluateRowsAlpha: only required params', async () => {
+    const responsePromise = client.eval.evaluateRowsAlpha('benchmark_id', {
+      input_rows: [{ foo: true }],
+      scoring_functions: ['string'],
+      task_config: {
+        eval_candidate: { model: 'model', sampling_params: { strategy: { type: 'greedy' } }, type: 'model' },
+        scoring_params: { foo: { judge_model: 'judge_model', type: 'llm_as_judge' } },
+        type: 'benchmark',
+      },
+    });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('evaluateRowsAlpha: required and optional params', async () => {
+    const response = await client.eval.evaluateRowsAlpha('benchmark_id', {
+      input_rows: [{ foo: true }],
+      scoring_functions: ['string'],
+      task_config: {
+        eval_candidate: {
+          model: 'model',
+          sampling_params: { strategy: { type: 'greedy' }, max_tokens: 0, repetition_penalty: 0 },
+          type: 'model',
+          system_message: { content: 'string', role: 'system' },
+        },
+        scoring_params: {
+          foo: {
+            judge_model: 'judge_model',
+            type: 'llm_as_judge',
+            aggregation_functions: ['average'],
+            judge_score_regexes: ['string'],
+            prompt_template: 'prompt_template',
+          },
+        },
         type: 'benchmark',
         num_examples: 0,
       },
@@ -45,6 +100,7 @@ describe('resource eval', () => {
     const responsePromise = client.eval.runEval('task_id', {
       task_config: {
         eval_candidate: { model: 'model', sampling_params: { strategy: { type: 'greedy' } }, type: 'model' },
+        scoring_params: { foo: { judge_model: 'judge_model', type: 'llm_as_judge' } },
         type: 'benchmark',
       },
     });
@@ -65,6 +121,56 @@ describe('resource eval', () => {
           sampling_params: { strategy: { type: 'greedy' }, max_tokens: 0, repetition_penalty: 0 },
           type: 'model',
           system_message: { content: 'string', role: 'system' },
+        },
+        scoring_params: {
+          foo: {
+            judge_model: 'judge_model',
+            type: 'llm_as_judge',
+            aggregation_functions: ['average'],
+            judge_score_regexes: ['string'],
+            prompt_template: 'prompt_template',
+          },
+        },
+        type: 'benchmark',
+        num_examples: 0,
+      },
+    });
+  });
+
+  test('runEvalAlpha: only required params', async () => {
+    const responsePromise = client.eval.runEvalAlpha('benchmark_id', {
+      task_config: {
+        eval_candidate: { model: 'model', sampling_params: { strategy: { type: 'greedy' } }, type: 'model' },
+        scoring_params: { foo: { judge_model: 'judge_model', type: 'llm_as_judge' } },
+        type: 'benchmark',
+      },
+    });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('runEvalAlpha: required and optional params', async () => {
+    const response = await client.eval.runEvalAlpha('benchmark_id', {
+      task_config: {
+        eval_candidate: {
+          model: 'model',
+          sampling_params: { strategy: { type: 'greedy' }, max_tokens: 0, repetition_penalty: 0 },
+          type: 'model',
+          system_message: { content: 'string', role: 'system' },
+        },
+        scoring_params: {
+          foo: {
+            judge_model: 'judge_model',
+            type: 'llm_as_judge',
+            aggregation_functions: ['average'],
+            judge_score_regexes: ['string'],
+            prompt_template: 'prompt_template',
+          },
         },
         type: 'benchmark',
         num_examples: 0,

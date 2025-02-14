@@ -51,7 +51,13 @@ export interface DatasetRetrieveResponse {
 
   type: 'dataset';
 
-  url: Shared.URL;
+  url: DatasetRetrieveResponse.URL;
+}
+
+export namespace DatasetRetrieveResponse {
+  export interface URL {
+    uri: string;
+  }
 }
 
 export type DatasetListResponse = Array<DatasetListResponse.DatasetListResponseItem>;
@@ -70,7 +76,13 @@ export namespace DatasetListResponse {
 
     type: 'dataset';
 
-    url: Shared.URL;
+    url: DatasetListResponseItem.URL;
+  }
+
+  export namespace DatasetListResponseItem {
+    export interface URL {
+      uri: string;
+    }
   }
 }
 
@@ -79,13 +91,19 @@ export interface DatasetRegisterParams {
 
   dataset_schema: Record<string, Shared.ParamType>;
 
-  url: Shared.URL;
+  url: DatasetRegisterParams.URL;
 
   metadata?: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
 
   provider_dataset_id?: string;
 
   provider_id?: string;
+}
+
+export namespace DatasetRegisterParams {
+  export interface URL {
+    uri: string;
+  }
 }
 
 export declare namespace Datasets {

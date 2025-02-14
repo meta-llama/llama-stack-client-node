@@ -24,6 +24,7 @@ describe('resource turn', () => {
       messages: [{ content: 'string', role: 'user', context: 'string' }],
       documents: [{ content: 'string', mime_type: 'mime_type' }],
       stream: false,
+      tool_config: { system_message_behavior: 'append', tool_choice: 'auto', tool_prompt_format: 'json' },
       toolgroups: ['string'],
     });
   });

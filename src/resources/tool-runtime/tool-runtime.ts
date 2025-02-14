@@ -86,9 +86,15 @@ export interface ToolRuntimeInvokeToolParams {
 }
 
 export interface ToolRuntimeListToolsParams {
-  mcp_endpoint?: Shared.URL;
+  mcp_endpoint?: ToolRuntimeListToolsParams.McpEndpoint;
 
   tool_group_id?: string;
+}
+
+export namespace ToolRuntimeListToolsParams {
+  export interface McpEndpoint {
+    uri: string;
+  }
 }
 
 ToolRuntime.RagTool = RagTool;

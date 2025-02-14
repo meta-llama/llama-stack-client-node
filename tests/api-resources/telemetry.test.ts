@@ -101,7 +101,7 @@ describe('resource telemetry', () => {
         timestamp: '2019-12-27T18:11:19.117Z',
         trace_id: 'trace_id',
         type: 'unstructured_log',
-        attributes: { foo: true },
+        attributes: { foo: 'string' },
       },
       ttl_seconds: 0,
     });

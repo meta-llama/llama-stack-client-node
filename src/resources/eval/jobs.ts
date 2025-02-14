@@ -6,26 +6,26 @@ import * as EvalAPI from './eval';
 
 export class Jobs extends APIResource {
   retrieve(
-    taskId: string,
+    benchmarkId: string,
     jobId: string,
     options?: Core.RequestOptions,
   ): Core.APIPromise<EvalAPI.EvaluateResponse> {
-    return this._client.get(`/v1/eval/tasks/${taskId}/jobs/${jobId}/result`, options);
+    return this._client.get(`/v1/eval/benchmarks/${benchmarkId}/jobs/${jobId}/result`, options);
   }
 
-  cancel(taskId: string, jobId: string, options?: Core.RequestOptions): Core.APIPromise<void> {
-    return this._client.delete(`/v1/eval/tasks/${taskId}/jobs/${jobId}`, {
+  cancel(benchmarkId: string, jobId: string, options?: Core.RequestOptions): Core.APIPromise<void> {
+    return this._client.delete(`/v1/eval/benchmarks/${benchmarkId}/jobs/${jobId}`, {
       ...options,
       headers: { Accept: '*/*', ...options?.headers },
     });
   }
 
   status(
-    taskId: string,
+    benchmarkId: string,
     jobId: string,
     options?: Core.RequestOptions,
   ): Core.APIPromise<JobStatusResponse | null> {
-    return this._client.get(`/v1/eval/tasks/${taskId}/jobs/${jobId}`, options);
+    return this._client.get(`/v1/eval/benchmarks/${benchmarkId}/jobs/${jobId}`, options);
   }
 }
 

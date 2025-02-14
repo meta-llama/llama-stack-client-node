@@ -2,7 +2,6 @@
 
 import { APIResource } from '../../resource';
 import * as Core from '../../core';
-import * as EvalAPI from './eval';
 import * as ScoringFunctionsAPI from '../scoring-functions';
 import * as Shared from '../shared';
 import * as JobsAPI from './jobs';
@@ -19,8 +18,24 @@ export class Eval extends APIResource {
     return this._client.post(`/v1/eval/tasks/${taskId}/evaluations`, { body, ...options });
   }
 
+  evaluateRowsAlpha(
+    benchmarkId: string,
+    body: EvalEvaluateRowsAlphaParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<EvaluateResponse> {
+    return this._client.post(`/v1/eval/benchmarks/${benchmarkId}/evaluations`, { body, ...options });
+  }
+
   runEval(taskId: string, body: EvalRunEvalParams, options?: Core.RequestOptions): Core.APIPromise<Job> {
     return this._client.post(`/v1/eval/tasks/${taskId}/jobs`, { body, ...options });
+  }
+
+  runEvalAlpha(
+    benchmarkId: string,
+    body: EvalRunEvalAlphaParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<Job> {
+    return this._client.post(`/v1/eval/benchmarks/${benchmarkId}/jobs`, { body, ...options });
   }
 }
 
@@ -47,26 +62,14 @@ export namespace EvalCandidate {
   }
 }
 
-export type EvalTaskConfig = EvalTaskConfig.BenchmarkEvalTaskConfig | EvalTaskConfig.AppEvalTaskConfig;
+export interface EvalTaskConfig {
+  eval_candidate: EvalCandidate;
 
-export namespace EvalTaskConfig {
-  export interface BenchmarkEvalTaskConfig {
-    eval_candidate: EvalAPI.EvalCandidate;
+  scoring_params: Record<string, ScoringFunctionsAPI.ScoringFnParams>;
 
-    type: 'benchmark';
+  type: 'benchmark';
 
-    num_examples?: number;
-  }
-
-  export interface AppEvalTaskConfig {
-    eval_candidate: EvalAPI.EvalCandidate;
-
-    scoring_params: Record<string, ScoringFunctionsAPI.ScoringFnParams>;
-
-    type: 'app';
-
-    num_examples?: number;
-  }
+  num_examples?: number;
 }
 
 export interface EvaluateResponse {
@@ -87,7 +90,19 @@ export interface EvalEvaluateRowsParams {
   task_config: EvalTaskConfig;
 }
 
+export interface EvalEvaluateRowsAlphaParams {
+  input_rows: Array<Record<string, boolean | number | string | Array<unknown> | unknown | null>>;
+
+  scoring_functions: Array<string>;
+
+  task_config: EvalTaskConfig;
+}
+
 export interface EvalRunEvalParams {
+  task_config: EvalTaskConfig;
+}
+
+export interface EvalRunEvalAlphaParams {
   task_config: EvalTaskConfig;
 }
 
@@ -100,7 +115,9 @@ export declare namespace Eval {
     type EvaluateResponse as EvaluateResponse,
     type Job as Job,
     type EvalEvaluateRowsParams as EvalEvaluateRowsParams,
+    type EvalEvaluateRowsAlphaParams as EvalEvaluateRowsAlphaParams,
     type EvalRunEvalParams as EvalRunEvalParams,
+    type EvalRunEvalAlphaParams as EvalRunEvalAlphaParams,
   };
 
   export { Jobs as Jobs, type JobStatusResponse as JobStatusResponse };

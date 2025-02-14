@@ -9,13 +9,13 @@ export interface AgentConfig {
 
   instructions: string;
 
-  max_infer_iters: number;
-
   model: string;
 
   client_tools?: Array<ToolRuntimeAPI.ToolDef>;
 
   input_shields?: Array<string>;
+
+  max_infer_iters?: number;
 
   output_shields?: Array<string>;
 
@@ -34,6 +34,11 @@ export interface AgentConfig {
   tool_choice?: 'auto' | 'required';
 
   /**
+   * Configuration for tool use.
+   */
+  tool_config?: AgentConfig.ToolConfig;
+
+  /**
    * Prompt format for calling custom / zero shot tools.
    */
   tool_prompt_format?: 'json' | 'function_tag' | 'python_list';
@@ -42,6 +47,37 @@ export interface AgentConfig {
 }
 
 export namespace AgentConfig {
+  /**
+   * Configuration for tool use.
+   */
+  export interface ToolConfig {
+    /**
+     * (Optional) Config for how to override the default system prompt. -
+     * `SystemMessageBehavior.append`: Appends the provided system message to the
+     * default system prompt. - `SystemMessageBehavior.replace`: Replaces the default
+     * system prompt with the provided system message. The system message can include
+     * the string '{{function_definitions}}' to indicate where the function definitions
+     * should be inserted.
+     */
+    system_message_behavior: 'append' | 'replace';
+
+    /**
+     * (Optional) Whether tool use is required or automatic. Defaults to
+     * ToolChoice.auto.
+     */
+    tool_choice?: 'auto' | 'required';
+
+    /**
+     * (Optional) Instructs the model how to format tool calls. By default, Llama Stack
+     * will attempt to use a format that is best adapted to the model. -
+     * `ToolPromptFormat.json`: The tool calls are formatted as a JSON object. -
+     * `ToolPromptFormat.function_tag`: The tool calls are enclosed in a
+     * <function=function_name> tag. - `ToolPromptFormat.python_list`: The tool calls
+     * are output as Python syntax -- a list of function calls.
+     */
+    tool_prompt_format?: 'json' | 'function_tag' | 'python_list';
+  }
+
   export interface UnionMember1 {
     args: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
 
@@ -66,6 +102,28 @@ export interface ChatCompletionResponse {
    * Optional log probabilities for generated tokens
    */
   logprobs?: Array<InferenceAPI.TokenLogProbs>;
+
+  metrics?: Array<ChatCompletionResponse.Metric>;
+}
+
+export namespace ChatCompletionResponse {
+  export interface Metric {
+    metric: string;
+
+    span_id: string;
+
+    timestamp: string;
+
+    trace_id: string;
+
+    type: 'metric';
+
+    unit: string;
+
+    value: number;
+
+    attributes?: Record<string, string | number | boolean | null>;
+  }
 }
 
 /**
@@ -95,7 +153,7 @@ export interface CompletionMessage {
   /**
    * List of tool calls. Each tool call is a ToolCall object.
    */
-  tool_calls: Array<ToolCall>;
+  tool_calls?: Array<ToolCall>;
 }
 
 export type ContentDelta = ContentDelta.TextDelta | ContentDelta.ImageDelta | ContentDelta.ToolCallDelta;
@@ -116,7 +174,7 @@ export namespace ContentDelta {
   export interface ToolCallDelta {
     parse_status: 'started' | 'in_progress' | 'failed' | 'succeeded';
 
-    tool_call: string | Shared.ToolCall;
+    tool_call: Shared.ToolCallOrString;
 
     type: 'tool_call';
   }
@@ -131,7 +189,7 @@ export interface Document {
     | Document.ImageContentItem
     | Document.TextContentItem
     | Array<InterleavedContentItem>
-    | URL;
+    | Document.URL;
 
   document_id: string;
 
@@ -170,7 +228,17 @@ export namespace Document {
        * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
        * Note that URL could have length limits.
        */
-      url?: Shared.URL;
+      url?: Image.URL;
+    }
+
+    export namespace Image {
+      /**
+       * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
+       * Note that URL could have length limits.
+       */
+      export interface URL {
+        uri: string;
+      }
     }
   }
 
@@ -187,6 +255,10 @@ export namespace Document {
      * Discriminator type of the content item. Always "text"
      */
     type: 'text';
+  }
+
+  export interface URL {
+    uri: string;
   }
 }
 
@@ -229,7 +301,17 @@ export namespace InterleavedContent {
        * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
        * Note that URL could have length limits.
        */
-      url?: Shared.URL;
+      url?: Image.URL;
+    }
+
+    export namespace Image {
+      /**
+       * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
+       * Note that URL could have length limits.
+       */
+      export interface URL {
+        uri: string;
+      }
     }
   }
 
@@ -286,7 +368,17 @@ export namespace InterleavedContentItem {
        * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
        * Note that URL could have length limits.
        */
-      url?: Shared.URL;
+      url?: Image.URL;
+    }
+
+    export namespace Image {
+      /**
+       * A URL of the image or data URL in the format of data:image/{type};base64,{data}.
+       * Note that URL could have length limits.
+       */
+      export interface URL {
+        uri: string;
+      }
     }
   }
 
@@ -530,6 +622,8 @@ export interface ToolCall {
   tool_name: 'brave_search' | 'wolfram_alpha' | 'photogen' | 'code_interpreter' | (string & {});
 }
 
+export type ToolCallOrString = string | ToolCall;
+
 export interface ToolParamDefinition {
   param_type: string;
 
@@ -563,10 +657,6 @@ export interface ToolResponseMessage {
    * Name of the tool that was called
    */
   tool_name: 'brave_search' | 'wolfram_alpha' | 'photogen' | 'code_interpreter' | (string & {});
-}
-
-export interface URL {
-  uri: string;
 }
 
 /**

@@ -2,7 +2,6 @@
 
 import { APIResource } from '../resource';
 import * as Core from '../core';
-import * as Shared from './shared';
 
 export class Toolgroups extends APIResource {
   /**
@@ -55,7 +54,13 @@ export interface ToolGroup {
 
   args?: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
 
-  mcp_endpoint?: Shared.URL;
+  mcp_endpoint?: ToolGroup.McpEndpoint;
+}
+
+export namespace ToolGroup {
+  export interface McpEndpoint {
+    uri: string;
+  }
 }
 
 export type ToolgroupListResponse = Array<ToolGroup>;
@@ -67,7 +72,13 @@ export interface ToolgroupRegisterParams {
 
   args?: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
 
-  mcp_endpoint?: Shared.URL;
+  mcp_endpoint?: ToolgroupRegisterParams.McpEndpoint;
+}
+
+export namespace ToolgroupRegisterParams {
+  export interface McpEndpoint {
+    uri: string;
+  }
 }
 
 export declare namespace Toolgroups {

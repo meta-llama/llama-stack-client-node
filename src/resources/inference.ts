@@ -79,6 +79,8 @@ export interface ChatCompletionResponseStreamChunk {
    * The event containing the new content
    */
   event: ChatCompletionResponseStreamChunk.Event;
+
+  metrics?: Array<ChatCompletionResponseStreamChunk.Metric>;
 }
 
 export namespace ChatCompletionResponseStreamChunk {
@@ -106,6 +108,24 @@ export namespace ChatCompletionResponseStreamChunk {
      * Optional reason why generation stopped, if complete
      */
     stop_reason?: 'end_of_turn' | 'end_of_message' | 'out_of_tokens';
+  }
+
+  export interface Metric {
+    metric: string;
+
+    span_id: string;
+
+    timestamp: string;
+
+    trace_id: string;
+
+    type: 'metric';
+
+    unit: string;
+
+    value: number;
+
+    attributes?: Record<string, string | number | boolean | null>;
   }
 }
 
