@@ -39,6 +39,16 @@ export class Eval extends APIResource {
   }
 }
 
+export interface BenchmarkConfig {
+  eval_candidate: EvalCandidate;
+
+  scoring_params: Record<string, ScoringFunctionsAPI.ScoringFnParams>;
+
+  type: 'benchmark';
+
+  num_examples?: number;
+}
+
 export type EvalCandidate = EvalCandidate.ModelCandidate | EvalCandidate.AgentCandidate;
 
 export namespace EvalCandidate {
@@ -62,16 +72,6 @@ export namespace EvalCandidate {
   }
 }
 
-export interface EvalTaskConfig {
-  eval_candidate: EvalCandidate;
-
-  scoring_params: Record<string, ScoringFunctionsAPI.ScoringFnParams>;
-
-  type: 'benchmark';
-
-  num_examples?: number;
-}
-
 export interface EvaluateResponse {
   generations: Array<Record<string, boolean | number | string | Array<unknown> | unknown | null>>;
 
@@ -87,7 +87,7 @@ export interface EvalEvaluateRowsParams {
 
   scoring_functions: Array<string>;
 
-  task_config: EvalTaskConfig;
+  task_config: BenchmarkConfig;
 }
 
 export interface EvalEvaluateRowsAlphaParams {
@@ -95,23 +95,23 @@ export interface EvalEvaluateRowsAlphaParams {
 
   scoring_functions: Array<string>;
 
-  task_config: EvalTaskConfig;
+  task_config: BenchmarkConfig;
 }
 
 export interface EvalRunEvalParams {
-  task_config: EvalTaskConfig;
+  task_config: BenchmarkConfig;
 }
 
 export interface EvalRunEvalAlphaParams {
-  task_config: EvalTaskConfig;
+  task_config: BenchmarkConfig;
 }
 
 Eval.Jobs = Jobs;
 
 export declare namespace Eval {
   export {
+    type BenchmarkConfig as BenchmarkConfig,
     type EvalCandidate as EvalCandidate,
-    type EvalTaskConfig as EvalTaskConfig,
     type EvaluateResponse as EvaluateResponse,
     type Job as Job,
     type EvalEvaluateRowsParams as EvalEvaluateRowsParams,

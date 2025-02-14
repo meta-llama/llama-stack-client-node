@@ -135,13 +135,13 @@ import {
   ToolResponse,
 } from './resources/agents/agents';
 import {
+  BenchmarkConfig,
   Eval,
   EvalCandidate,
   EvalEvaluateRowsAlphaParams,
   EvalEvaluateRowsParams,
   EvalRunEvalAlphaParams,
   EvalRunEvalParams,
-  EvalTaskConfig,
   EvaluateResponse,
   Job,
 } from './resources/eval/eval';
@@ -415,8 +415,8 @@ export declare namespace LlamaStackClient {
 
   export {
     Eval as Eval,
+    type BenchmarkConfig as BenchmarkConfig,
     type EvalCandidate as EvalCandidate,
-    type EvalTaskConfig as EvalTaskConfig,
     type EvaluateResponse as EvaluateResponse,
     type Job as Job,
     type EvalEvaluateRowsParams as EvalEvaluateRowsParams,
