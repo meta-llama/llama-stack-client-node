@@ -7,13 +7,12 @@ const client = new LlamaStackClient({ baseURL: process.env['TEST_API_BASE_URL'] 
 
 describe('resource eval', () => {
   test('evaluateRows: only required params', async () => {
-    const responsePromise = client.eval.evaluateRows('task_id', {
+    const responsePromise = client.eval.evaluateRows('benchmark_id', {
       input_rows: [{ foo: true }],
       scoring_functions: ['string'],
       task_config: {
         eval_candidate: { model: 'model', sampling_params: { strategy: { type: 'greedy' } }, type: 'model' },
         scoring_params: { foo: { judge_model: 'judge_model', type: 'llm_as_judge' } },
-        type: 'benchmark',
       },
     });
     const rawResponse = await responsePromise.asResponse();
@@ -26,7 +25,7 @@ describe('resource eval', () => {
   });
 
   test('evaluateRows: required and optional params', async () => {
-    const response = await client.eval.evaluateRows('task_id', {
+    const response = await client.eval.evaluateRows('benchmark_id', {
       input_rows: [{ foo: true }],
       scoring_functions: ['string'],
       task_config: {
@@ -45,7 +44,6 @@ describe('resource eval', () => {
             prompt_template: 'prompt_template',
           },
         },
-        type: 'benchmark',
         num_examples: 0,
       },
     });
@@ -58,7 +56,6 @@ describe('resource eval', () => {
       task_config: {
         eval_candidate: { model: 'model', sampling_params: { strategy: { type: 'greedy' } }, type: 'model' },
         scoring_params: { foo: { judge_model: 'judge_model', type: 'llm_as_judge' } },
-        type: 'benchmark',
       },
     });
     const rawResponse = await responsePromise.asResponse();
@@ -90,18 +87,16 @@ describe('resource eval', () => {
             prompt_template: 'prompt_template',
           },
         },
-        type: 'benchmark',
         num_examples: 0,
       },
     });
   });
 
   test('runEval: only required params', async () => {
-    const responsePromise = client.eval.runEval('task_id', {
+    const responsePromise = client.eval.runEval('benchmark_id', {
       task_config: {
         eval_candidate: { model: 'model', sampling_params: { strategy: { type: 'greedy' } }, type: 'model' },
         scoring_params: { foo: { judge_model: 'judge_model', type: 'llm_as_judge' } },
-        type: 'benchmark',
       },
     });
     const rawResponse = await responsePromise.asResponse();
@@ -114,7 +109,7 @@ describe('resource eval', () => {
   });
 
   test('runEval: required and optional params', async () => {
-    const response = await client.eval.runEval('task_id', {
+    const response = await client.eval.runEval('benchmark_id', {
       task_config: {
         eval_candidate: {
           model: 'model',
@@ -131,7 +126,6 @@ describe('resource eval', () => {
             prompt_template: 'prompt_template',
           },
         },
-        type: 'benchmark',
         num_examples: 0,
       },
     });
@@ -142,7 +136,6 @@ describe('resource eval', () => {
       task_config: {
         eval_candidate: { model: 'model', sampling_params: { strategy: { type: 'greedy' } }, type: 'model' },
         scoring_params: { foo: { judge_model: 'judge_model', type: 'llm_as_judge' } },
-        type: 'benchmark',
       },
     });
     const rawResponse = await responsePromise.asResponse();
@@ -172,7 +165,6 @@ describe('resource eval', () => {
             prompt_template: 'prompt_template',
           },
         },
-        type: 'benchmark',
         num_examples: 0,
       },
     });

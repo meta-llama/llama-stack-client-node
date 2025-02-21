@@ -11,11 +11,11 @@ export class Eval extends APIResource {
   jobs: JobsAPI.Jobs = new JobsAPI.Jobs(this._client);
 
   evaluateRows(
-    taskId: string,
+    benchmarkId: string,
     body: EvalEvaluateRowsParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<EvaluateResponse> {
-    return this._client.post(`/v1/eval/tasks/${taskId}/evaluations`, { body, ...options });
+    return this._client.post(`/v1/eval/benchmarks/${benchmarkId}/evaluations`, { body, ...options });
   }
 
   evaluateRowsAlpha(
@@ -26,8 +26,8 @@ export class Eval extends APIResource {
     return this._client.post(`/v1/eval/benchmarks/${benchmarkId}/evaluations`, { body, ...options });
   }
 
-  runEval(taskId: string, body: EvalRunEvalParams, options?: Core.RequestOptions): Core.APIPromise<Job> {
-    return this._client.post(`/v1/eval/tasks/${taskId}/jobs`, { body, ...options });
+  runEval(benchmarkId: string, body: EvalRunEvalParams, options?: Core.RequestOptions): Core.APIPromise<Job> {
+    return this._client.post(`/v1/eval/benchmarks/${benchmarkId}/jobs`, { body, ...options });
   }
 
   runEvalAlpha(
@@ -43,8 +43,6 @@ export interface BenchmarkConfig {
   eval_candidate: EvalCandidate;
 
   scoring_params: Record<string, ScoringFunctionsAPI.ScoringFnParams>;
-
-  type: 'benchmark';
 
   num_examples?: number;
 }

@@ -77,6 +77,8 @@ export interface ToolInvocationResult {
   error_code?: number;
 
   error_message?: string;
+
+  metadata?: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
 }
 
 export interface ToolRuntimeInvokeToolParams {
