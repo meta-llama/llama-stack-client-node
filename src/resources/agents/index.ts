@@ -27,4 +27,7 @@ export {
   type TurnCreateParams,
   type TurnCreateParamsNonStreaming,
   type TurnCreateParamsStreaming,
+  type TurnResumeParams,
+  type TurnResumeParamsNonStreaming,
+  type TurnResumeParamsStreaming,
 } from './turn';

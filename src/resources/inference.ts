@@ -216,7 +216,7 @@ export interface InferenceChatCompletionParamsBase {
    * (Optional) Whether tool use is required or automatic. Defaults to
    * ToolChoice.auto. .. deprecated:: Use tool_config instead.
    */
-  tool_choice?: 'auto' | 'required';
+  tool_choice?: 'auto' | 'required' | 'none';
 
   /**
    * (Optional) Configuration for tool use.
@@ -264,13 +264,13 @@ export namespace InferenceChatCompletionParams {
      * the string '{{function_definitions}}' to indicate where the function definitions
      * should be inserted.
      */
-    system_message_behavior: 'append' | 'replace';
+    system_message_behavior?: 'append' | 'replace';
 
     /**
-     * (Optional) Whether tool use is required or automatic. Defaults to
-     * ToolChoice.auto.
+     * (Optional) Whether tool use is automatic, required, or none. Can also specify a
+     * tool name to use a specific tool. Defaults to ToolChoice.auto.
      */
-    tool_choice?: 'auto' | 'required';
+    tool_choice?: 'auto' | 'required' | 'none' | (string & {});
 
     /**
      * (Optional) Instructs the model how to format tool calls. By default, Llama Stack
@@ -385,17 +385,35 @@ export interface InferenceCompletionParamsStreaming extends InferenceCompletionP
 
 export interface InferenceEmbeddingsParams {
   /**
-   * List of contents to generate embeddings for. Note that content can be
-   * multimodal. The behavior depends on the model and provider. Some models may only
-   * support text.
+   * List of contents to generate embeddings for. Each content can be a string or an
+   * InterleavedContentItem (and hence can be multimodal). The behavior depends on
+   * the model and provider. Some models may only support text.
    */
-  contents: Array<Shared.InterleavedContent>;
+  contents: Array<string> | Array<Shared.InterleavedContentItem>;
 
   /**
    * The identifier of the model to use. The model must be an embedding model
    * registered with Llama Stack and available via the /models endpoint.
    */
   model_id: string;
+
+  /**
+   * (Optional) Output dimensionality for the embeddings. Only supported by
+   * Matryoshka models.
+   */
+  output_dimension?: number;
+
+  /**
+   * (Optional) How is the embedding being used? This is only supported by asymmetric
+   * embedding models.
+   */
+  task_type?: 'query' | 'document';
+
+  /**
+   * (Optional) Config for how to truncate text for embedding when text is longer
+   * than the model's max sequence length.
+   */
+  text_truncation?: 'none' | 'start' | 'end';
 }
 
 export declare namespace Inference {

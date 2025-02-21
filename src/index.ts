@@ -32,7 +32,6 @@ import {
   Datasets,
   ListDatasetsResponse,
 } from './resources/datasets';
-import { EvalTaskListResponse, EvalTaskRegisterParams, EvalTasks } from './resources/eval-tasks';
 import {
   ChatCompletionResponseStreamChunk,
   CompletionResponse,
@@ -163,14 +162,14 @@ import {
 
 export interface ClientOptions {
   /**
-   * Defaults to process.env['LLAMA_STACK_CLIENT_API_KEY'].
+   * Defaults to process.env['LLAMA_STACK_API_KEY'].
    */
   apiKey?: string | null | undefined;
 
   /**
    * Override the default base URL for the API, e.g., "https://api.example.com/v2/"
    *
-   * Defaults to process.env['LLAMA_STACK_CLIENT_BASE_URL'].
+   * Defaults to process.env['LLAMA_STACK_BASE_URL'].
    */
   baseURL?: string | null | undefined;
 
@@ -235,8 +234,8 @@ export class LlamaStackClient extends Core.APIClient {
   /**
    * API Client for interfacing with the Llama Stack Client API.
    *
-   * @param {string | null | undefined} [opts.apiKey=process.env['LLAMA_STACK_CLIENT_API_KEY'] ?? null]
-   * @param {string} [opts.baseURL=process.env['LLAMA_STACK_CLIENT_BASE_URL'] ?? http://any-hosted-llama-stack.com] - Override the default base URL for the API.
+   * @param {string | null | undefined} [opts.apiKey=process.env['LLAMA_STACK_API_KEY'] ?? null]
+   * @param {string} [opts.baseURL=process.env['LLAMA_STACK_BASE_URL'] ?? http://any-hosted-llama-stack.com] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {number} [opts.httpAgent] - An HTTP agent used to manage HTTP(s) connections.
    * @param {Core.Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
@@ -245,8 +244,8 @@ export class LlamaStackClient extends Core.APIClient {
    * @param {Core.DefaultQuery} opts.defaultQuery - Default query parameters to include with every request to the API.
    */
   constructor({
-    baseURL = Core.readEnv('LLAMA_STACK_CLIENT_BASE_URL'),
-    apiKey = Core.readEnv('LLAMA_STACK_CLIENT_API_KEY') ?? null,
+    baseURL = Core.readEnv('LLAMA_STACK_BASE_URL'),
+    apiKey = Core.readEnv('LLAMA_STACK_API_KEY') ?? null,
     ...opts
   }: ClientOptions = {}) {
     const options: ClientOptions = {
@@ -290,7 +289,6 @@ export class LlamaStackClient extends Core.APIClient {
   datasetio: API.Datasetio = new API.Datasetio(this);
   scoring: API.Scoring = new API.Scoring(this);
   scoringFunctions: API.ScoringFunctions = new API.ScoringFunctions(this);
-  evalTasks: API.EvalTasks = new API.EvalTasks(this);
   benchmarks: API.Benchmarks = new API.Benchmarks(this);
 
   protected override defaultQuery(): Core.DefaultQuery | undefined {
@@ -358,7 +356,6 @@ LlamaStackClient.Telemetry = Telemetry;
 LlamaStackClient.Datasetio = Datasetio;
 LlamaStackClient.Scoring = Scoring;
 LlamaStackClient.ScoringFunctions = ScoringFunctions;
-LlamaStackClient.EvalTasks = EvalTasks;
 LlamaStackClient.Benchmarks = Benchmarks;
 export declare namespace LlamaStackClient {
   export type RequestOptions = Core.RequestOptions;
@@ -553,12 +550,6 @@ export declare namespace LlamaStackClient {
     type ScoringFnParams as ScoringFnParams,
     type ScoringFunctionListResponse as ScoringFunctionListResponse,
     type ScoringFunctionRegisterParams as ScoringFunctionRegisterParams,
-  };
-
-  export {
-    EvalTasks as EvalTasks,
-    type EvalTaskListResponse as EvalTaskListResponse,
-    type EvalTaskRegisterParams as EvalTaskRegisterParams,
   };
 
   export {

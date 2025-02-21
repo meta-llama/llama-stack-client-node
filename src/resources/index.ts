@@ -48,7 +48,6 @@ export {
   type EvalRunEvalParams,
   type EvalRunEvalAlphaParams,
 } from './eval/eval';
-export { EvalTasks, type EvalTaskListResponse, type EvalTaskRegisterParams } from './eval-tasks';
 export {
   Inference,
   type ChatCompletionResponseStreamChunk,

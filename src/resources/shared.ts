@@ -27,11 +27,11 @@ export interface AgentConfig {
   sampling_params?: SamplingParams;
 
   /**
-   * Whether tool use is required or automatic. This is a hint to the model which may
-   * not be followed. It depends on the Instruction Following capabilities of the
-   * model.
+   * @deprecated Whether tool use is required or automatic. This is a hint to the
+   * model which may not be followed. It depends on the Instruction Following
+   * capabilities of the model.
    */
-  tool_choice?: 'auto' | 'required';
+  tool_choice?: 'auto' | 'required' | 'none';
 
   /**
    * Configuration for tool use.
@@ -39,11 +39,11 @@ export interface AgentConfig {
   tool_config?: AgentConfig.ToolConfig;
 
   /**
-   * Prompt format for calling custom / zero shot tools.
+   * @deprecated Prompt format for calling custom / zero shot tools.
    */
   tool_prompt_format?: 'json' | 'function_tag' | 'python_list';
 
-  toolgroups?: Array<string | AgentConfig.UnionMember1>;
+  toolgroups?: Array<string | AgentConfig.AgentToolGroupWithArgs>;
 }
 
 export namespace AgentConfig {
@@ -59,13 +59,13 @@ export namespace AgentConfig {
      * the string '{{function_definitions}}' to indicate where the function definitions
      * should be inserted.
      */
-    system_message_behavior: 'append' | 'replace';
+    system_message_behavior?: 'append' | 'replace';
 
     /**
-     * (Optional) Whether tool use is required or automatic. Defaults to
-     * ToolChoice.auto.
+     * (Optional) Whether tool use is automatic, required, or none. Can also specify a
+     * tool name to use a specific tool. Defaults to ToolChoice.auto.
      */
-    tool_choice?: 'auto' | 'required';
+    tool_choice?: 'auto' | 'required' | 'none' | (string & {});
 
     /**
      * (Optional) Instructs the model how to format tool calls. By default, Llama Stack
@@ -78,7 +78,7 @@ export namespace AgentConfig {
     tool_prompt_format?: 'json' | 'function_tag' | 'python_list';
   }
 
-  export interface UnionMember1 {
+  export interface AgentToolGroupWithArgs {
     args: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
 
     name: string;
@@ -486,6 +486,8 @@ export namespace QueryGeneratorConfig {
 }
 
 export interface QueryResult {
+  metadata: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
+
   /**
    * A image content item
    */

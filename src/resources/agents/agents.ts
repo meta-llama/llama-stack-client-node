@@ -23,6 +23,9 @@ import {
   TurnResource,
   TurnResponseEvent,
   TurnResponseEventPayload,
+  TurnResumeParams,
+  TurnResumeParamsNonStreaming,
+  TurnResumeParamsStreaming,
 } from './turn';
 
 export class Agents extends APIResource {
@@ -117,6 +120,8 @@ export interface ToolResponse {
   content: Shared.InterleavedContent;
 
   tool_name: 'brave_search' | 'wolfram_alpha' | 'photogen' | 'code_interpreter' | (string & {});
+
+  metadata?: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
 }
 
 export interface AgentCreateResponse {
@@ -161,5 +166,8 @@ export declare namespace Agents {
     type TurnCreateParams as TurnCreateParams,
     type TurnCreateParamsNonStreaming as TurnCreateParamsNonStreaming,
     type TurnCreateParamsStreaming as TurnCreateParamsStreaming,
+    type TurnResumeParams as TurnResumeParams,
+    type TurnResumeParamsNonStreaming as TurnResumeParamsNonStreaming,
+    type TurnResumeParamsStreaming as TurnResumeParamsStreaming,
   };
 }

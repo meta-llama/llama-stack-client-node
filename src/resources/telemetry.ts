@@ -1,7 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../resource';
-import { isRequestOptions } from '../core';
 import * as Core from '../core';
 
 export class Telemetry extends APIResource {
@@ -15,20 +14,11 @@ export class Telemetry extends APIResource {
 
   getSpanTree(
     spanId: string,
-    query?: TelemetryGetSpanTreeParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<TelemetryGetSpanTreeResponse>;
-  getSpanTree(spanId: string, options?: Core.RequestOptions): Core.APIPromise<TelemetryGetSpanTreeResponse>;
-  getSpanTree(
-    spanId: string,
-    query: TelemetryGetSpanTreeParams | Core.RequestOptions = {},
+    body: TelemetryGetSpanTreeParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<TelemetryGetSpanTreeResponse> {
-    if (isRequestOptions(query)) {
-      return this.getSpanTree(spanId, {}, query);
-    }
     return (
-      this._client.get(`/v1/telemetry/spans/${spanId}/tree`, { query, ...options }) as Core.APIPromise<{
+      this._client.post(`/v1/telemetry/spans/${spanId}/tree`, { body, ...options }) as Core.APIPromise<{
         data: TelemetryGetSpanTreeResponse;
       }>
     )._thenUnwrap((obj) => obj.data);
@@ -47,30 +37,22 @@ export class Telemetry extends APIResource {
   }
 
   querySpans(
-    query: TelemetryQuerySpansParams,
+    body: TelemetryQuerySpansParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<TelemetryQuerySpansResponse> {
     return (
-      this._client.get('/v1/telemetry/spans', { query, ...options }) as Core.APIPromise<{
+      this._client.post('/v1/telemetry/spans', { body, ...options }) as Core.APIPromise<{
         data: TelemetryQuerySpansResponse;
       }>
     )._thenUnwrap((obj) => obj.data);
   }
 
   queryTraces(
-    query?: TelemetryQueryTracesParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<TelemetryQueryTracesResponse>;
-  queryTraces(options?: Core.RequestOptions): Core.APIPromise<TelemetryQueryTracesResponse>;
-  queryTraces(
-    query: TelemetryQueryTracesParams | Core.RequestOptions = {},
+    body: TelemetryQueryTracesParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<TelemetryQueryTracesResponse> {
-    if (isRequestOptions(query)) {
-      return this.queryTraces({}, query);
-    }
     return (
-      this._client.get('/v1/telemetry/traces', { query, ...options }) as Core.APIPromise<{
+      this._client.post('/v1/telemetry/traces', { body, ...options }) as Core.APIPromise<{
         data: TelemetryQueryTracesResponse;
       }>
     )._thenUnwrap((obj) => obj.data);

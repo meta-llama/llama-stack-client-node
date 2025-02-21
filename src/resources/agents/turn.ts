@@ -48,6 +48,47 @@ export class TurnResource extends APIResource {
   ): Core.APIPromise<Turn> {
     return this._client.get(`/v1/agents/${agentId}/session/${sessionId}/turn/${turnId}`, options);
   }
+
+  /**
+   * Resume an agent turn with executed tool call responses. When a Turn has the
+   * status `awaiting_input` due to pending input from client side tool calls, this
+   * endpoint can be used to submit the outputs from the tool calls once they are
+   * ready.
+   */
+  resume(
+    agentId: string,
+    sessionId: string,
+    turnId: string,
+    body: TurnResumeParamsNonStreaming,
+    options?: Core.RequestOptions,
+  ): APIPromise<Turn>;
+  resume(
+    agentId: string,
+    sessionId: string,
+    turnId: string,
+    body: TurnResumeParamsStreaming,
+    options?: Core.RequestOptions,
+  ): APIPromise<Stream<AgentTurnResponseStreamChunk>>;
+  resume(
+    agentId: string,
+    sessionId: string,
+    turnId: string,
+    body: TurnResumeParamsBase,
+    options?: Core.RequestOptions,
+  ): APIPromise<Stream<AgentTurnResponseStreamChunk> | Turn>;
+  resume(
+    agentId: string,
+    sessionId: string,
+    turnId: string,
+    body: TurnResumeParams,
+    options?: Core.RequestOptions,
+  ): APIPromise<Turn> | APIPromise<Stream<AgentTurnResponseStreamChunk>> {
+    return this._client.post(`/v1/agents/${agentId}/session/${sessionId}/turn/${turnId}/resume`, {
+      body,
+      ...options,
+      stream: body.stream ?? false,
+    }) as APIPromise<Turn> | APIPromise<Stream<AgentTurnResponseStreamChunk>>;
+  }
 }
 
 /**
@@ -175,7 +216,8 @@ export type TurnResponseEventPayload =
   | TurnResponseEventPayload.AgentTurnResponseStepProgressPayload
   | TurnResponseEventPayload.AgentTurnResponseStepCompletePayload
   | TurnResponseEventPayload.AgentTurnResponseTurnStartPayload
-  | TurnResponseEventPayload.AgentTurnResponseTurnCompletePayload;
+  | TurnResponseEventPayload.AgentTurnResponseTurnCompletePayload
+  | TurnResponseEventPayload.AgentTurnResponseTurnAwaitingInputPayload;
 
 export namespace TurnResponseEventPayload {
   export interface AgentTurnResponseStepStartPayload {
@@ -226,12 +268,23 @@ export namespace TurnResponseEventPayload {
      */
     turn: TurnAPI.Turn;
   }
+
+  export interface AgentTurnResponseTurnAwaitingInputPayload {
+    event_type: 'turn_awaiting_input';
+
+    /**
+     * A single turn in an interaction with an Agentic System.
+     */
+    turn: TurnAPI.Turn;
+  }
 }
 
 export type TurnCreateParams = TurnCreateParamsNonStreaming | TurnCreateParamsStreaming;
 
 export interface TurnCreateParamsBase {
   messages: Array<Shared.UserMessage | Shared.ToolResponseMessage>;
+
+  allow_turn_resume?: boolean;
 
   documents?: Array<TurnCreateParams.Document>;
 
@@ -242,7 +295,7 @@ export interface TurnCreateParamsBase {
    */
   tool_config?: TurnCreateParams.ToolConfig;
 
-  toolgroups?: Array<string | TurnCreateParams.UnionMember1>;
+  toolgroups?: Array<string | TurnCreateParams.AgentToolGroupWithArgs>;
 }
 
 export namespace TurnCreateParams {
@@ -336,13 +389,13 @@ export namespace TurnCreateParams {
      * the string '{{function_definitions}}' to indicate where the function definitions
      * should be inserted.
      */
-    system_message_behavior: 'append' | 'replace';
+    system_message_behavior?: 'append' | 'replace';
 
     /**
-     * (Optional) Whether tool use is required or automatic. Defaults to
-     * ToolChoice.auto.
+     * (Optional) Whether tool use is automatic, required, or none. Can also specify a
+     * tool name to use a specific tool. Defaults to ToolChoice.auto.
      */
-    tool_choice?: 'auto' | 'required';
+    tool_choice?: 'auto' | 'required' | 'none' | (string & {});
 
     /**
      * (Optional) Instructs the model how to format tool calls. By default, Llama Stack
@@ -355,7 +408,7 @@ export namespace TurnCreateParams {
     tool_prompt_format?: 'json' | 'function_tag' | 'python_list';
   }
 
-  export interface UnionMember1 {
+  export interface AgentToolGroupWithArgs {
     args: Record<string, boolean | number | string | Array<unknown> | unknown | null>;
 
     name: string;
@@ -373,6 +426,39 @@ export interface TurnCreateParamsStreaming extends TurnCreateParamsBase {
   stream: true;
 }
 
+export type TurnResumeParams = TurnResumeParamsNonStreaming | TurnResumeParamsStreaming;
+
+export interface TurnResumeParamsBase {
+  /**
+   * The tool call responses to resume the turn with.
+   */
+  tool_responses: Array<Shared.ToolResponseMessage>;
+
+  /**
+   * Whether to stream the response.
+   */
+  stream?: boolean;
+}
+
+export namespace TurnResumeParams {
+  export type TurnResumeParamsNonStreaming = TurnAPI.TurnResumeParamsNonStreaming;
+  export type TurnResumeParamsStreaming = TurnAPI.TurnResumeParamsStreaming;
+}
+
+export interface TurnResumeParamsNonStreaming extends TurnResumeParamsBase {
+  /**
+   * Whether to stream the response.
+   */
+  stream?: false;
+}
+
+export interface TurnResumeParamsStreaming extends TurnResumeParamsBase {
+  /**
+   * Whether to stream the response.
+   */
+  stream: true;
+}
+
 export declare namespace TurnResource {
   export {
     type AgentTurnResponseStreamChunk as AgentTurnResponseStreamChunk,
@@ -382,5 +468,8 @@ export declare namespace TurnResource {
     type TurnCreateParams as TurnCreateParams,
     type TurnCreateParamsNonStreaming as TurnCreateParamsNonStreaming,
     type TurnCreateParamsStreaming as TurnCreateParamsStreaming,
+    type TurnResumeParams as TurnResumeParams,
+    type TurnResumeParamsNonStreaming as TurnResumeParamsNonStreaming,
+    type TurnResumeParamsStreaming as TurnResumeParamsStreaming,
   };
 }

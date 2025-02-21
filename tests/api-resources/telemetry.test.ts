@@ -25,7 +25,7 @@ describe('resource telemetry', () => {
   });
 
   test('getSpanTree', async () => {
-    const responsePromise = client.telemetry.getSpanTree('span_id');
+    const responsePromise = client.telemetry.getSpanTree('span_id', {});
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -33,24 +33,6 @@ describe('resource telemetry', () => {
     const dataAndResponse = await responsePromise.withResponse();
     expect(dataAndResponse.data).toBe(response);
     expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('getSpanTree: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.telemetry.getSpanTree('span_id', { path: '/_stainless_unknown_path' }),
-    ).rejects.toThrow(LlamaStackClient.NotFoundError);
-  });
-
-  test('getSpanTree: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.telemetry.getSpanTree(
-        'span_id',
-        { attributes_to_return: ['string'], max_depth: 0 },
-        { path: '/_stainless_unknown_path' },
-      ),
-    ).rejects.toThrow(LlamaStackClient.NotFoundError);
   });
 
   test('getTrace', async () => {
@@ -133,7 +115,7 @@ describe('resource telemetry', () => {
 
   // unsupported query params in java / kotlin
   test.skip('queryTraces', async () => {
-    const responsePromise = client.telemetry.queryTraces();
+    const responsePromise = client.telemetry.queryTraces({});
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -141,30 +123,6 @@ describe('resource telemetry', () => {
     const dataAndResponse = await responsePromise.withResponse();
     expect(dataAndResponse.data).toBe(response);
     expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  // unsupported query params in java / kotlin
-  test.skip('queryTraces: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.telemetry.queryTraces({ path: '/_stainless_unknown_path' })).rejects.toThrow(
-      LlamaStackClient.NotFoundError,
-    );
-  });
-
-  // unsupported query params in java / kotlin
-  test.skip('queryTraces: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.telemetry.queryTraces(
-        {
-          attribute_filters: [{ key: 'key', op: 'eq', value: true }],
-          limit: 0,
-          offset: 0,
-          order_by: ['string'],
-        },
-        { path: '/_stainless_unknown_path' },
-      ),
-    ).rejects.toThrow(LlamaStackClient.NotFoundError);
   });
 
   test('saveSpansToDataset: only required params', async () => {

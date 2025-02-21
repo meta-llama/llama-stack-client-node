@@ -43,7 +43,7 @@ export interface BatchInferenceChatCompletionParams {
    * not be followed. It depends on the Instruction Following capabilities of the
    * model.
    */
-  tool_choice?: 'auto' | 'required';
+  tool_choice?: 'auto' | 'required' | 'none';
 
   /**
    * Prompt format for calling custom / zero shot tools.

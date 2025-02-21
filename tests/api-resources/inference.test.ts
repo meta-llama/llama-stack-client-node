@@ -77,6 +77,12 @@ describe('resource inference', () => {
   });
 
   test('embeddings: required and optional params', async () => {
-    const response = await client.inference.embeddings({ contents: ['string'], model_id: 'model_id' });
+    const response = await client.inference.embeddings({
+      contents: ['string'],
+      model_id: 'model_id',
+      output_dimension: 0,
+      task_type: 'query',
+      text_truncation: 'none',
+    });
   });
 });
